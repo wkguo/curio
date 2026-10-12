@@ -1,0 +1,812 @@
+# Curio curriculum pack — Matter (Singapore Primary Science, P5–P6 "Cycles" theme; draws on "Diversity")
+#
+# Schema notes (validated by curriculum/loader.py -> schemas/curriculum.py):
+#   * `keywords` / `patterns` are case-insensitive Python regular expressions.
+#     A reasoning point is "hit" when ANY of its patterns matches the student's text.
+#   * `teaching` blocks are keyed by TeachingStrategy names. Each strategy holds
+#     chat bubbles (`messages`) and an optional Socratic `follow_up` question.
+#   * `resolution_patterns` on a misconception detect when the student has fixed
+#     the idea during the teaching dialogue.
+
+topic_id: matter
+name: Matter
+subject: Primary Science
+level: Primary 5–6
+theme: Cycles
+syllabus_ref: "MOE Primary Science Syllabus (2023) · Cycles · Matter and changes of state; states of matter also draw on Diversity (approximate mapping, pending teacher review)"
+emoji: droplet
+color: "#14A89A"
+tagline: What is everything made of — and how does it change?
+description: >
+  Explore solids, liquids and gases, find out why air has mass, and discover
+  what really happens when water melts, boils, evaporates and condenses.
+
+concepts:
+  - id: states_of_matter
+    name: States of Matter
+    emoji: test_tube
+    learning_objective: Describe matter as anything that has mass and occupies space, existing as solid, liquid or gas.
+    mastery_criterion: "Classifies a new everyday item as a solid, liquid or gas, and justifies that it is matter because it has mass and takes up space."
+    summary: Matter is anything that has mass and takes up space. It can be a solid, a liquid or a gas.
+    prerequisites: []
+    key_ideas:
+      - Matter has mass and takes up space.
+      - The three states of matter are solid, liquid and gas.
+    position: {x: 0, y: 0}
+
+  - id: properties_of_states
+    name: Solids, Liquids & Gases
+    emoji: jar
+    learning_objective: Compare solids, liquids and gases in terms of definite shape, definite volume and whether they can be compressed.
+    mastery_criterion: "Explains, in a new everyday situation, which properties (shape, volume, whether it can be compressed) change and which stay the same for a solid, a liquid or a gas."
+    summary: Solids keep their shape. Liquids keep their volume but take the shape of the container. Gases fill any space.
+    prerequisites: [states_of_matter]
+    key_ideas:
+      - Solids have a definite shape and a definite volume.
+      - Liquids have a definite volume but no definite shape.
+      - Gases have no definite shape and no definite volume, and can be compressed.
+    position: {x: 0, y: 1}
+
+  - id: gas_has_mass
+    name: Air Has Mass
+    emoji: balloon
+    learning_objective: Show that air is matter — it has mass and takes up space.
+    mastery_criterion: "Explains, in a new everyday situation, that air and other gases have mass and take up space, so adding or removing gas changes the mass."
+    summary: Air may be invisible, but it has mass and takes up space, just like solids and liquids.
+    prerequisites: [properties_of_states]
+    key_ideas:
+      - Air has mass, so a ball pumped with more air is slightly heavier.
+      - Air takes up space — that is why an "empty" cup pushed upside down into water stays dry inside.
+    position: {x: -1, y: 2}
+
+  - id: melting_freezing
+    name: Melting & Freezing
+    emoji: ice
+    learning_objective: Explain that a solid melts when it gains heat and a liquid freezes (solidifies) when it loses heat.
+    mastery_criterion: "Explains, in a new everyday situation, that a solid melts when it gains heat and a liquid freezes when it loses heat, without describing cold as something that goes in or out."
+    summary: Solids melt into liquids when they gain heat. Liquids freeze into solids when they lose heat.
+    prerequisites: [properties_of_states]
+    key_ideas:
+      - Melting is a solid changing into a liquid when it gains heat.
+      - Freezing is a liquid changing into a solid when it loses heat.
+      - Pure water melts and freezes at 0°C.
+    position: {x: 1, y: 2}
+
+  - id: evaporation_boiling
+    name: Evaporation & Boiling
+    emoji: teapot
+    learning_objective: Explain that evaporation turns liquid water into water vapour at any temperature, while boiling happens quickly at 100°C with bubbles of water vapour.
+    mastery_criterion: "Explains, in a new everyday situation, that water evaporates into water vapour at any temperature, and that the bubbles in boiling water are water vapour, not air."
+    summary: Water can evaporate at any temperature. Boiling is fast evaporation at 100°C, with bubbles of water vapour.
+    prerequisites: [melting_freezing]
+    key_ideas:
+      - Evaporation happens at the surface of a liquid at any temperature.
+      - Heat, wind, and a larger exposed surface make evaporation faster.
+      - The bubbles in boiling water are water vapour, not air.
+    position: {x: 0, y: 3}
+
+  - id: dissolving_vs_melting
+    name: Dissolving vs Melting
+    emoji: salt
+    learning_objective: Distinguish dissolving (a substance mixing evenly into a liquid) from melting (a solid turning into a liquid when it gains heat).
+    mastery_criterion: "Decides, in a new everyday situation, whether a substance is dissolving or melting, and gives evidence (such as taste, or what is left after evaporation) that a dissolved substance is still there."
+    summary: Melting needs heat to turn a solid into a liquid. Dissolving is when a substance spreads out in a liquid, like sugar in kopi.
+    prerequisites: [melting_freezing]
+    key_ideas:
+      - When sugar dissolves, it is still there — you can taste it.
+      - Melting involves one substance changing state because it gains heat.
+    position: {x: 2, y: 3}
+
+  - id: condensation
+    name: Condensation
+    emoji: cloud
+    learning_objective: Explain that water vapour in the air condenses into water droplets when it loses heat to a cooler surface.
+    mastery_criterion: "Explains, in a new everyday situation, that droplets on a cold surface come from water vapour in the air that loses heat and condenses, not from liquid leaking through."
+    summary: When water vapour touches something cold, it loses heat and turns back into tiny water droplets.
+    prerequisites: [evaporation_boiling]
+    key_ideas:
+      - Air contains water vapour, especially in humid Singapore.
+      - Water vapour loses heat to a cool surface and condenses into water droplets.
+    position: {x: 0, y: 4}
+
+misconceptions:
+  - id: air_has_no_mass
+    concept: gas_has_mass
+    type: FACTUAL_ERROR
+    label: Air has no mass
+    statement: Air has no mass because it is invisible and feels like nothing.
+    corrective_target: Air is matter. It has mass and takes up space, so adding air to a ball makes it slightly heavier.
+    nudge: "Air is hard to see, but that doesn't mean it is nothing. Let's investigate what's inside the ball."
+    patterns:
+      - "air (has|have) no (mass|weight)"
+      - "air (is|weighs) (nothing|weightless|massless)"
+      - "(air|gas|gases) (doesn't|does not|don't|do not|cannot|can't) (have|has) (any )?(mass|weight)"
+      - "air (doesn't|does not|don't|do not) (weigh|take up)"
+      - "(air|gas|gases) (is|are) (weightless|massless)"
+    resolution_patterns:
+      - "(air|gas).{0,30}(has|have|got|had) (some )?(mass|weight)"
+      - "(air|gas).{0,30}takes? up space"
+      - "(heavier|more mass).{0,40}air"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Let's test that idea! 🧪
+          - Hang two blown-up balloons on the ends of a ruler so it balances. Now pop one balloon.
+          - The side with the popped balloon goes **up**! Something with mass left that balloon.
+        follow_up: What escaped from the popped balloon — and what does that tell you about air?
+      DIRECT_HINT:
+        messages:
+          - Here's a hint 💡 — all matter has mass and takes up space. Air is matter too!
+        follow_up: So what happens to the ball's mass when more air is pumped in?
+      ANALOGY:
+        messages:
+          - Think of air like a crowd at a hawker centre during lunch. 🍜
+          - Each person is tiny compared to the whole building — but pack in more people and the crowd weighs more!
+          - Air is made of tiny particles too. Pump in more, and there is more mass.
+        follow_up: So does a ball with more air inside have more mass or less mass?
+    confirm:
+      - Yes! 🎉 Air **has mass**, so the ball becomes a little heavier.
+      - Air is matter — it has mass and takes up space, even though we can't see it.
+
+  - id: melting_is_dissolving
+    concept: dissolving_vs_melting
+    type: VOCABULARY_CONFUSION
+    label: Melting vs Dissolving
+    statement: Sugar or salt "melts" when it disappears in water.
+    corrective_target: Sugar dissolves — it spreads out in the liquid and is still there. Melting is a solid turning into a liquid when it gains heat.
+    nudge: "The sugar seems to disappear, but is it really gone? Let's think about which word fits best."
+    patterns:
+      - "(sugar|salt|milo|powder) (has |had |will |would |just )?(melt|melts|melted|melting)"
+      - "melt(s|ed)? (in|into) (the )?(water|tea|kopi|coffee|drink|milk)"
+      - "yes.{0,20}melt"
+      - "(melted|melts|melt) the (sugar|salt|milo|powder)"
+    resolution_patterns:
+      - "dissolv"
+      - "(mix|mixes|mixed|spread|spreads|spread out).{0,30}(water|kopi|liquid|drink)"
+    teaching:
+      SOCRATIC_QUESTION:
+        messages:
+          - Let's think like a scientist. 🔍
+          - After the sugar "disappears", what does the kopi taste like?
+          - If the kopi still tastes sweet, is the sugar still there?
+        follow_up: What word do scientists use when sugar spreads out in a liquid?
+      COUNTEREXAMPLE:
+        messages:
+          - Let's try it with cold water instead! 🧊
+          - Stir sugar into ice-cold water. It still disappears — even though nothing is hot enough to melt sugar.
+          - Sugar actually needs to be heated to about 180°C to melt!
+        follow_up: So if it's not melting, what is the sugar doing in the water?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — **melting** needs heat to turn a solid into a liquid on its own. **Dissolving** is when a substance spreads out in a liquid.
+        follow_up: Which one happens when sugar goes into kopi?
+    confirm:
+      - That's right! ✨ The sugar **dissolves** — it spreads out in the kopi and is still there.
+      - That's why the kopi tastes sweet. Melting is different — it needs heat.
+
+  - id: evaporation_needs_boiling
+    concept: evaporation_boiling
+    type: OVERGENERALIZATION
+    label: Evaporation needs boiling
+    statement: Water can only turn into water vapour when it boils at 100°C.
+    corrective_target: Evaporation happens at any temperature, slowly, from the surface of the water. Boiling is just fast evaporation at 100°C.
+    nudge: "The clothes dried, but the water was never near 100°C. Let's figure out how that could happen."
+    patterns:
+      - "(only|must|need|needs|needed|have to|has to).{0,30}(boil|boils|boiled|boiling|100)"
+      - "(reach|reached|reaches|reaching|got to|gets to|get to) 100"
+      - "(sun|heat).{0,30}(boil|boils|boiled) (the|away|off|it)"
+      - "boiled (away|off)"
+    resolution_patterns:
+      - "evaporat.{0,40}(below|without|even|any|room|slow|slowly)"
+      - "(any|room|all|every|lower) temperature"
+      - "(slowly|slow).{0,30}evaporat"
+      - "(does not|doesn't|no) need to boil"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Let's check with something you've seen! 🔍
+          - A puddle at the school field dries up by the afternoon. But the puddle never got anywhere near 100°C!
+        follow_up: So can water turn into water vapour without boiling?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — **evaporation** can happen at any temperature. It is just slower when it's cooler.
+          - Sun and wind make it faster.
+        follow_up: Where did the water in the wet clothes go?
+      SIMPLER_EXPLANATION:
+        messages:
+          - Water is always slowly escaping from its surface into the air as water vapour. 💧
+          - Boiling is just a very fast, bubbly way of doing the same thing at 100°C.
+        follow_up: So which one dried the clothes — boiling or evaporation?
+    confirm:
+      - Exactly! 🎉 The water **evaporated** — it slowly turned into water vapour at a normal temperature.
+      - Water doesn't need to boil to evaporate.
+
+  - id: boiling_bubbles_are_air
+    concept: evaporation_boiling
+    type: CONCEPT_CONFUSION
+    label: Bubbles are air
+    statement: The bubbles in boiling water are air.
+    corrective_target: The bubbles in boiling water are water vapour — liquid water that has changed into a gas and rises out of the water.
+    nudge: "Those bubbles keep coming for as long as the water boils. Let's think about what could be inside them."
+    patterns:
+      - "bubbles.{0,30}(are|is|contain|contains|filled with|full of|made of) (the |just )?(air|oxygen|hydrogen)"
+      - "(air|oxygen) (bubbles|escaping|coming out|trapped)"
+      - "(trapped|hidden) air"
+    resolution_patterns:
+      - "(steam|water vapour|water vapor|gaseous water)"
+      - "water.{0,30}(turn|turns|turning|turned|change|changes|changing|changed).{0,20}(gas|vapour|vapor|steam)"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Let's test that idea! 🧪
+          - If the bubbles were trapped air, they would run out after a few seconds.
+          - But the bubbles keep coming for as long as the water boils — and the water level goes **down**!
+        follow_up: If the water level drops, what could the bubbles be made of?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — at 100°C, water gains heat and changes into a gas called **water vapour**, right inside the pot.
+        follow_up: So what is inside the big bubbles?
+      SOCRATIC_QUESTION:
+        messages:
+          - Let's think step by step. 🔍
+          - The pot only has water in it. The water is getting hotter and hotter.
+        follow_up: What can water change into when it gets hot enough?
+    confirm:
+      - Yes! 🎉 The bubbles are **water vapour** — water that has changed into a gas.
+      - They rise up and escape into the air, so the water level drops.
+
+  - id: condensation_through_glass
+    concept: condensation
+    type: CAUSAL_ERROR
+    label: Droplets leak through glass
+    statement: The water droplets on the outside of a cold glass come from the drink leaking through the glass.
+    corrective_target: The droplets come from water vapour in the surrounding air, which loses heat to the cold glass and condenses.
+    nudge: "The glass has no holes in it. Let's figure out where else that water could come from."
+    patterns:
+      - "(through|seep|seeps|seeped|leak|leaks|leaked|leaking|sweat|sweats|sweating|come out|comes out|came out|pass|passes|passed).{0,30}(glass|cup|can|bottle)"
+      - "(water|drink|juice|milo).{0,20}(from|inside) the (glass|cup|can).{0,30}(outside|out)"
+      - "(glass|cup|can) (is )?(sweating|leaking)"
+    resolution_patterns:
+      - "(water vapour|water vapor|moisture)"
+      - "(air|surroundings).{0,30}(vapour|vapor|moisture)"
+      - "condens"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Let's test that idea! 🧪
+          - Fill a glass with iced **blue** coloured water. The droplets that form outside are clear, not blue!
+          - And an empty cold glass from the fridge gets droplets too.
+        follow_up: If the water didn't come from inside the glass, where could it come from?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — Singapore's air is full of invisible **water vapour**.
+          - When water vapour touches something cold, it loses heat.
+        follow_up: What happens to water vapour when it loses heat to the cold glass?
+      PREREQUISITE_REVIEW:
+        messages:
+          - Let's go back to evaporation. ☁️
+          - Water from puddles, drains and wet clothes evaporates into the air as water vapour every day.
+        follow_up: So is there water vapour in the air around Ahmad's cold drink?
+    confirm:
+      - Excellent! ✨ The droplets come from **water vapour in the air**.
+      - The water vapour loses heat to the cold glass and **condenses** into water droplets.
+
+
+  - id: cold_added_to_freeze
+    concept: melting_freezing
+    type: CAUSAL_ERROR
+    label: Cold goes in or out
+    statement: Things freeze because cold goes into them, and melt because their cold leaves them.
+    corrective_target: Only heat moves. A liquid freezes when it loses heat, and a solid melts when it gains heat.
+    nudge: "Something really does move between the object and its surroundings. Let's work out what it is."
+    patterns:
+      - "cold(ness)?.{0,25}(goes|go|went|moves|moved|flows|flowed|enters|entered|gets|got|seeps|seeped) (into|in)\\b"
+      - "(gives|give|gave|giving|put|puts|putting|add|adds|added) (out )?(the |some |its )?cold(ness)?\\b"
+      - "(gain|gains|gained|absorb|absorbs|absorbed|take in|takes in|took in) (the |some )?cold(ness)?\\b"
+      - "(lose|loses|lost|losing) (its |the |all its )?cold(ness)?\\b"
+      - "cold(ness)? (leaves|left|escapes|escaped|goes out|went out|comes out|came out)"
+    resolution_patterns:
+      - "(gain|gains|gained|absorb|absorbs|absorbed|take in|takes in|took in).{0,20}heat"
+      - "(lose|loses|lost|losing|give out|gives out|gave out).{0,20}heat"
+      - "heat.{0,30}(from|out of|into|to) (the|its|his|her)"
+    teaching:
+      PREREQUISITE_REVIEW:
+        messages:
+          - Let's go back one step to heat flow. 🔥
+          - Heat always moves from a hotter place to a colder place. "Cold" is not a thing that moves — it just means less heat.
+        follow_up: Which is hotter — the object or its surroundings? So which way does heat move?
+      COUNTEREXAMPLE:
+        messages:
+          - Let's check that idea! 🧪
+          - Put your hand near the back of a fridge. It feels warm! A fridge works by moving heat OUT of the food, not by pushing cold in.
+        follow_up: So when juice freezes in the freezer, is it gaining heat or losing heat?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — melting happens when a solid **gains heat**. Freezing happens when a liquid **loses heat**.
+        follow_up: Is the object in this question gaining heat or losing heat?
+    confirm:
+      - Yes! 🎉 Only **heat** moves — from hotter to colder.
+      - A solid melts when it **gains heat**, and a liquid freezes when it **loses heat**.
+
+questions:
+  - id: matter_001
+    concept: gas_has_mass
+    related_concepts: [states_of_matter]
+    difficulty: 2
+    emoji: basketball
+    prompt: Ravi weighs a flat basketball on an electronic balance. Then he pumps it full of air and weighs it again. What happens to the reading? Explain.
+    answer_patterns: ["increase", "heavier", "more", "higher"]
+    answer_praise: "You noticed that pumping air into the ball changes something about it."
+    expected_answer: The reading increases slightly, because air has mass. Pumping more air into the ball adds mass.
+    expected_reasoning:
+      - id: mass_increases
+        point: The reading (mass) increases slightly.
+        patterns:
+          - "heavier"
+          - "(more|greater) mass"
+          - "(mass|reading).{0,20}(increase|increases|increased|goes up|went up|higher|more)"
+      - id: air_has_mass
+        point: Air has mass.
+        patterns:
+          - "air.{0,30}(has|have|got|had) (some )?(mass|weight)"
+          - "air is matter"
+    required_points: [air_has_mass]
+    misconceptions: [air_has_no_mass]
+    hints:
+      - Is air matter? What do all kinds of matter have?
+      - What did Ravi add to the ball?
+    demo_answers:
+      misconception: The reading stays the same because air has no mass.
+      dialogue: Oh, the air pumped in has mass, so the ball becomes a bit heavier.
+      correct: The reading increases a little. Air has mass, so pumping more air into the ball makes it heavier.
+    transfer_questions:
+      - id: matter_001_t1
+        prompt: Mei hangs two blown-up balloons at the two ends of a ruler so that it balances. She pops one balloon. Which side of the ruler goes up? Why?
+        emoji: balloon
+        answer_patterns: ["popped", "burst", "up", "lighter"]
+        expected_answer: The side with the popped balloon goes up, because the air that escaped had mass, so that side became lighter.
+        expected_reasoning:
+          - id: air_has_mass
+            point: The escaped air had mass, so that side became lighter.
+            patterns:
+              - "air.{0,30}(has|have|had|got) (some )?(mass|weight)"
+              - "(lost|loses|lose|less) (mass|air)"
+        required_points: [air_has_mass]
+        demo_answer: The side with the popped balloon goes up, because the air that escaped had mass, so that side became lighter.
+
+      - id: matter_001_t2
+        prompt: Ahmad weighs a closed bottle of fizzy drink. He opens it, lets the fizzy gas escape, closes it again and weighs it once more. Is the bottle lighter or heavier now? Why?
+        emoji: cup_with_straw
+        answer_patterns: ["lighter", "less", "decrease", "lower"]
+        expected_answer: It is slightly lighter, because the gas that escaped had mass.
+        expected_reasoning:
+          - id: gas_has_mass
+            point: The escaped gas had mass, so the bottle lost mass.
+            patterns:
+              - "(gas|air|fizz|bubbles).{0,30}(has|have|had|got) (some )?(mass|weight)"
+              - "(lost|loses|lose|less) (mass|gas)"
+        required_points: [gas_has_mass]
+        demo_answer: It is a little lighter, because the gas that escaped had mass.
+
+  - id: matter_002
+    concept: properties_of_states
+    related_concepts: [states_of_matter]
+    difficulty: 1
+    emoji: cup_with_straw
+    prompt: Siti pours 250 ml of orange juice from a tall glass into a wide, flat bowl. Does the shape of the juice change? Does its volume change? Explain.
+    answer_patterns: ["shape", "volume", "same"]
+    answer_praise: "You noticed that the juice looks different in the bowl."
+    expected_answer: The shape changes because a liquid takes the shape of its container, but the volume stays the same at 250 ml because a liquid has a definite volume.
+    expected_reasoning:
+      - id: shape_changes
+        point: The juice takes the shape of the bowl — liquids have no definite shape.
+        patterns:
+          - "(takes?|took) the shape"
+          - "shape.{0,20}(change|changes|changed|different)"
+          - "no (definite|fixed) shape"
+      - id: volume_same
+        point: The volume stays the same — liquids have a definite volume.
+        patterns:
+          - "volume.{0,30}(same|not change|doesn't change|does not change|stays|stay|still 250|unchanged)"
+          - "(definite|fixed) volume"
+    required_points: [shape_changes, volume_same]
+    misconceptions: []
+    hints:
+      - Did Siti spill or add any juice?
+      - Does a liquid keep its own shape, or take the shape of what it's in?
+    demo_answers:
+      misconception: There is less juice now because it looks lower in the bowl.
+      dialogue: The volume is the same, only the shape changed.
+      correct: The juice takes the shape of the bowl, so its shape changes. But its volume stays the same at 250 ml because liquids have a definite volume.
+    transfer_questions:
+      - id: matter_002_t1
+        prompt: Ahmad seals the tip of a syringe full of air and pushes the plunger. It moves in a little. Would the same thing happen if the syringe were full of water? Explain.
+        emoji: test_tube
+        answer_patterns: ["no", "not", "cannot", "can't"]
+        expected_answer: No. Air is a gas with no definite volume, so it can be compressed. Water is a liquid with a definite volume, so it cannot be compressed much.
+        expected_reasoning:
+          - id: gas_compressible
+            point: Air (gas) can be compressed but water (liquid) has a definite volume and cannot.
+            patterns:
+              - "compress"
+              - "squash"
+              - "(definite|fixed) volume"
+        required_points: [gas_compressible]
+        demo_answer: No. Air is a gas, so it can be compressed and the plunger moves in. Water is a liquid with a definite volume, so it cannot be compressed much.
+
+      - id: matter_002_t2
+        prompt: Ravi moves a wooden block from a small box into a big basket. Does the block's shape or volume change? Explain.
+        emoji: wood
+        answer_patterns: ["neither", "(not|n't|no) change", "same", "keeps"]
+        expected_answer: Neither changes. A solid has a definite shape and a definite volume, so the block keeps its own shape and volume in any container.
+        expected_reasoning:
+          - id: solid_definite
+            point: A solid has a definite shape and a definite volume.
+            patterns:
+              - "(definite|fixed) (shape|volume)"
+              - "(keep|keeps|kept) (its )?(own )?(shape|volume)"
+              - "(shape|volume).{0,30}(same|not change|doesn't change|does not change|stays|stay)"
+        required_points: [solid_definite]
+        demo_answer: Neither changes. A solid has a definite shape and a definite volume, so the block keeps its shape in the basket.
+
+  - id: matter_003
+    concept: dissolving_vs_melting
+    related_concepts: [melting_freezing]
+    difficulty: 2
+    emoji: hot_beverage
+    prompt: Mei stirs a spoonful of sugar into her hot kopi. After a while, she cannot see the sugar anymore. Her brother says the sugar melted. Is he right? Explain.
+    answer_patterns: ["dissolv", "no", "not"]
+    answer_praise: "You noticed that the sugar seems to disappear in the kopi."
+    expected_answer: No. The sugar dissolved — it spread out in the kopi and is still there, which is why the kopi tastes sweet. Melting needs heat to turn a solid into a liquid on its own.
+    expected_reasoning:
+      - id: dissolved
+        point: The sugar dissolved in the kopi.
+        patterns: ["dissolv"]
+      - id: still_there
+        point: The sugar is still there — the kopi tastes sweet.
+        patterns:
+          - "(still|is) (there|in the (kopi|coffee|drink|liquid))"
+          - "(taste|tastes|tasted) sweet"
+          - "(not|isn't|hasn't|didn't).{0,20}(gone|disappear)"
+    required_points: [dissolved]
+    misconceptions: [melting_is_dissolving]
+    hints:
+      - Does the kopi taste sweet after the sugar disappears?
+      - Would sugar also disappear in cold water?
+    demo_answers:
+      misconception: Yes, the sugar melted in the hot kopi because the kopi is hot.
+      dialogue: Oh, the sugar dissolved in the kopi and it is still there, that's why it tastes sweet.
+      correct: No. The sugar dissolved in the kopi. It spread out into tiny bits in the liquid, so it is still there and the kopi tastes sweet.
+    transfer_questions:
+      - id: matter_003_t1
+        prompt: Ahmad stirs a spoonful of salt into a glass of room-temperature water. The salt disappears from view. Is this melting or dissolving? How could he show the salt is still there?
+        emoji: salt
+        answer_patterns: ["dissolv"]
+        expected_answer: It is dissolving. The salt is still in the water — he could taste it, or let the water evaporate and the salt would be left behind.
+        expected_reasoning:
+          - id: dissolved
+            point: The salt dissolved.
+            patterns: ["dissolv"]
+          - id: still_there
+            point: The salt is still there and can be shown by tasting or evaporating the water.
+            patterns:
+              - "(still|is) (there|in the water)"
+              - "(left behind|remain|remains)"
+              - "(taste|tastes) salty"
+        required_points: [dissolved, still_there]
+        demo_answer: It is dissolving. The salt is still in the water. He can taste it, or let the water evaporate and the salt will be left behind.
+
+      - id: matter_003_t2
+        prompt: Siti puts a piece of butter into a hot pan, and a spoonful of salt into a pot of soup. Both seem to disappear. Which one melted and which one dissolved? Explain.
+        emoji: butter
+        answer_patterns: ["butter.{0,40}melt", "salt.{0,40}dissolv"]
+        expected_answer: The butter melted — it gained heat from the hot pan and changed from a solid into a liquid. The salt dissolved — it spread out in the soup and is still there, so the soup tastes salty.
+        expected_reasoning:
+          - id: butter_melts
+            point: The butter melted because it gained heat.
+            patterns: ["butter.{0,40}melt", "melt.{0,40}butter"]
+          - id: salt_dissolves
+            point: The salt dissolved in the soup and is still there.
+            patterns: ["salt.{0,40}dissolv", "dissolv.{0,40}salt"]
+        required_points: [butter_melts, salt_dissolves]
+        demo_answer: The butter melted because it gained heat from the hot pan. The salt dissolved in the soup and is still there, so the soup tastes salty.
+
+  - id: matter_004
+    concept: evaporation_boiling
+    related_concepts: [properties_of_states]
+    difficulty: 2
+    emoji: sun
+    prompt: Siti's mother hangs wet clothes on the bamboo poles outside their HDB flat on a sunny morning. By afternoon, the clothes are dry, but the water never got anywhere near 100°C. Where did the water go?
+    answer_patterns: ["evaporat", "vapour", "vapor", "air"]
+    answer_praise: "You noticed that the water left the clothes even though nobody wiped them."
+    expected_answer: The water evaporated — it slowly changed into water vapour and went into the surrounding air. Evaporation can happen at any temperature; the sun and wind make it faster.
+    expected_reasoning:
+      - id: evaporated
+        point: The water evaporated.
+        patterns: ["evaporat"]
+      - id: into_air
+        point: It became water vapour in the surrounding air.
+        patterns:
+          - "(water vapour|water vapor)"
+          - "into the (air|surroundings)"
+      - id: any_temperature
+        point: Evaporation happens at any temperature (no boiling needed).
+        patterns:
+          - "(any|room|normal|lower) temperature"
+          - "(without|not) boil"
+    required_points: [evaporated, into_air]
+    misconceptions: [evaporation_needs_boiling]
+    hints:
+      - Does water need to boil before it can turn into water vapour?
+      - Where does a puddle go on a sunny day?
+    demo_answers:
+      misconception: The sun made the water very hot until it reached 100°C, so it boiled away.
+      dialogue: Maybe water can evaporate slowly at room temperature, even without boiling.
+      correct: The water evaporated. It slowly changed into water vapour and went into the surrounding air. Evaporation can happen at any temperature, and the sun and wind make it faster.
+    transfer_questions:
+      - id: matter_004_t1
+        prompt: After a rainy morning, there is a puddle on the school field. By the end of recess, the puddle is gone. What happened to the water?
+        emoji: water_wave
+        answer_patterns: ["evaporat", "vapour", "vapor", "air"]
+        expected_answer: The water in the puddle evaporated into water vapour in the air.
+        expected_reasoning:
+          - id: evaporated
+            point: The water evaporated.
+            patterns: ["evaporat"]
+        required_points: [evaporated]
+        demo_answer: The water in the puddle evaporated and became water vapour in the air.
+
+      - id: matter_004_t2
+        prompt: Mum mops the kitchen floor in the morning. Twenty minutes later the floor is dry, even though nobody heated it. Where did the water go? Why does turning on the fan make it dry faster?
+        emoji: droplet
+        answer_patterns: ["evaporat", "vapour", "vapor", "air"]
+        expected_answer: The water evaporated into water vapour in the air, even at room temperature. The wind from the fan makes evaporation faster.
+        expected_reasoning:
+          - id: evaporated
+            point: The water evaporated.
+            patterns: ["evaporat"]
+          - id: wind_faster
+            point: Moving air from the fan makes evaporation faster.
+            patterns:
+              - "(fan|wind|moving air).{0,40}(faster|quicker|speed|more quickly)"
+              - "(faster|quicker).{0,40}(fan|wind)"
+        required_points: [evaporated]
+        demo_answer: The water evaporated into the air as water vapour, and the wind from the fan makes it evaporate faster.
+
+  - id: matter_005
+    concept: evaporation_boiling
+    related_concepts: [melting_freezing]
+    difficulty: 3
+    emoji: pot
+    prompt: Ravi watches a pot of water boiling on the stove. Big bubbles form at the bottom and rise to the top. What is inside the bubbles?
+    answer_patterns: ["vapour", "vapor", "steam", "gas"]
+    answer_praise: "You noticed that the bubbles only appear when the water gets very hot."
+    expected_answer: The bubbles are water vapour. The water gains heat, changes into a gas inside the pot, and the bubbles rise and escape into the air.
+    expected_reasoning:
+      - id: water_vapour
+        point: The bubbles are water vapour (water that has changed into a gas).
+        patterns:
+          - "(steam|water vapour|water vapor|gaseous water)"
+          - "water.{0,30}(turn|turns|turning|turned|change|changes|changing|changed).{0,20}(gas|vapour|vapor|steam)"
+      - id: gains_heat
+        point: The water gains heat and boils.
+        patterns:
+          - "(gain|gains|gained|absorb|absorbs|absorbed).{0,20}heat"
+          - "100"
+    required_points: [water_vapour]
+    misconceptions: [boiling_bubbles_are_air]
+    hints:
+      - The pot only has water in it. What can water change into when it gets very hot?
+      - What happens to the water level if you keep boiling it?
+    demo_answers:
+      misconception: The bubbles are air that was trapped in the water.
+      dialogue: So the bubbles are water that turned into water vapour.
+      correct: The bubbles are water vapour. When the water boils, it gains heat and changes into a gas inside the pot, and the bubbles rise and escape into the air.
+    transfer_questions:
+      - id: matter_005_t1
+        prompt: Mei boils water in a glass kettle and forgets to switch it off. The water level goes down, and bubbles keep forming. Where did the missing water go?
+        emoji: teapot
+        answer_patterns: ["vapour", "vapor", "steam", "gas"]
+        expected_answer: The water changed into water vapour in the bubbles and escaped into the air, so the water level dropped.
+        expected_reasoning:
+          - id: water_vapour
+            point: The water changed into water vapour and escaped.
+            patterns:
+              - "(steam|water vapour|water vapor)"
+              - "water.{0,30}(turn|turns|turning|turned|change|changes|changing|changed).{0,20}(gas|vapour|vapor|steam)"
+        required_points: [water_vapour]
+        demo_answer: The water turned into water vapour in the bubbles and escaped into the air, so the water level dropped.
+
+      - id: matter_005_t2
+        prompt: Ravi watches instant noodles cooking in a pot of boiling water. Big bubbles keep rising from the bottom, and the water level slowly drops. What is inside the bubbles, and where does the missing water go?
+        emoji: cooking
+        answer_patterns: ["vapour", "vapor", "steam", "gas"]
+        expected_answer: The bubbles are water vapour. The water gains heat, changes into a gas and escapes into the air, so the water level drops.
+        expected_reasoning:
+          - id: water_vapour
+            point: The bubbles are water vapour, which escapes into the air.
+            patterns:
+              - "(steam|water vapour|water vapor)"
+              - "water.{0,30}(turn|turns|turning|turned|change|changes|changing|changed).{0,20}(gas|vapour|vapor|steam)"
+        required_points: [water_vapour]
+        demo_answer: The bubbles are water vapour. The water changes into a gas and escapes into the air, so the water level drops.
+
+  - id: matter_006
+    concept: condensation
+    related_concepts: [evaporation_boiling]
+    difficulty: 3
+    emoji: glass_of_milk
+    prompt: At the hawker centre, Ahmad orders a glass of iced Milo. After a few minutes, tiny water droplets appear on the outside of the glass. Where do the droplets come from?
+    answer_patterns: ["vapour", "vapor", "air", "condens"]
+    answer_praise: "You noticed that the droplets appear only on the outside of the cold glass."
+    expected_answer: Water vapour in the warm surrounding air touches the cold glass, loses heat and condenses into water droplets on the outside of the glass.
+    expected_reasoning:
+      - id: vapour_in_air
+        point: The water comes from water vapour in the surrounding air.
+        patterns:
+          - "(water vapour|water vapor|moisture)"
+      - id: cools_condenses
+        point: The water vapour loses heat to the cold glass and condenses.
+        patterns:
+          - "condens"
+          - "(lose|loses|lost|losing).{0,20}heat"
+    required_points: [vapour_in_air, cools_condenses]
+    misconceptions: [condensation_through_glass]
+    hints:
+      - Is there water in the air around us, even if we can't see it?
+      - What happens to water vapour when it touches something cold?
+    demo_answers:
+      misconception: The Milo leaks through the glass and comes out on the outside.
+      dialogue: Maybe the water comes from water vapour in the air around the glass.
+      correct: Water vapour in the warm surrounding air touches the cold glass. It loses heat and condenses into water droplets on the outside of the glass.
+    transfer_questions:
+      - id: matter_006_t1
+        prompt: Ravi's family drives with the air-con on. On a humid morning, tiny water droplets appear on the OUTSIDE of the car windows. Explain why.
+        emoji: car
+        answer_patterns: ["vapour", "vapor", "condens"]
+        expected_answer: The warm air outside contains water vapour. It touches the cold window, loses heat and condenses into water droplets.
+        expected_reasoning:
+          - id: vapour_in_air
+            point: The outside air contains water vapour.
+            patterns: ["(water vapour|water vapor|moisture)"]
+          - id: cools_condenses
+            point: The water vapour loses heat to the cold window and condenses.
+            patterns: ["condens", "(lose|loses|lost|losing).{0,20}heat"]
+        required_points: [vapour_in_air, cools_condenses]
+        demo_answer: The warm air outside has water vapour. It touches the cold window, loses heat and condenses into water droplets.
+      - id: matter_006_t2
+        prompt: Siti takes a can of cold 100PLUS out of the fridge. Soon the outside of the can is wet, even though the can is still sealed. Where did the water come from?
+        emoji: ice
+        answer_patterns: ["vapour", "vapor", "condens", "air"]
+        expected_answer: Water vapour in the air lost heat to the cold can and condensed into water droplets on its surface.
+        expected_reasoning:
+          - id: vapour_in_air
+            point: The water came from water vapour in the air.
+            patterns: ["(water vapour|water vapor|moisture)"]
+          - id: cools_condenses
+            point: The water vapour lost heat to the cold can and condensed.
+            patterns: ["condens", "(lose|loses|lost|losing).{0,20}heat"]
+        required_points: [vapour_in_air, cools_condenses]
+        demo_answer: Water vapour in the air touched the cold can, lost heat and condensed into water droplets.
+
+  - id: matter_007
+    concept: melting_freezing
+    related_concepts: [properties_of_states]
+    difficulty: 2
+    emoji: ice_cream
+    prompt: Siti pours orange juice into ice-pop moulds and puts them in the freezer. The next morning, the juice has become hard ice pops. Explain what happened to the juice.
+    answer_patterns: ["\\b(freeze|freezes|froze|frozen|freezing)\\b", "solid", "heat"]
+    answer_praise: "You noticed that the juice changed from runny to hard."
+    expected_answer: The juice lost heat to the colder air in the freezer. When it lost enough heat, it froze — it changed from a liquid into a solid.
+    expected_reasoning:
+      - id: loses_heat
+        point: The juice loses heat to the colder freezer.
+        patterns:
+          - "(lose|loses|lost|losing|give out|gives out|gave out).{0,20}heat"
+          - "heat.{0,40}(from|out of) the juice"
+      - id: freezes_solid
+        point: The juice freezes — it changes from a liquid into a solid.
+        patterns:
+          - "\\b(freeze|freezes|froze|frozen|freezing)\\b"
+          - "solidif"
+          - "(became|become|becomes|turned|turns|changed|changes).{0,25}(solid|ice)"
+    required_points: [loses_heat, freezes_solid]
+    misconceptions: [cold_added_to_freeze]
+    hints:
+      - Is the freezer colder or warmer than the juice?
+      - Which way does heat flow between the juice and the freezer?
+    demo_answers:
+      misconception: The cold from the freezer went into the juice and made it hard.
+      dialogue: The juice lost heat to the colder freezer, so it froze.
+      correct: The juice lost heat to the colder air in the freezer. It froze and changed from a liquid into a solid.
+    transfer_questions:
+      - id: matter_007_t1
+        prompt: Ahmad fills an ice-cube tray with water and puts it in the freezer. Explain how the water becomes ice.
+        emoji: ice
+        answer_patterns: ["\\b(freeze|freezes|froze|frozen|freezing)\\b", "solid", "heat"]
+        expected_answer: The water loses heat to the colder air in the freezer, so it freezes and changes from a liquid into solid ice.
+        expected_reasoning:
+          - id: loses_heat
+            point: The water loses heat to the colder freezer.
+            patterns:
+              - "(lose|loses|lost|losing|give out|gives out|gave out).{0,20}heat"
+              - "heat.{0,40}(from|out of) the water"
+        required_points: [loses_heat]
+        demo_answer: The water loses heat to the colder air in the freezer, so it freezes into solid ice.
+      - id: matter_007_t2
+        prompt: At a factory, workers pour hot liquid metal into moulds. As it cools, the metal becomes solid. Explain what happens to the metal, using the idea of heat.
+        emoji: nut_and_bolt
+        answer_patterns: ["heat", "solid", "\\b(freeze|freezes|froze|frozen|freezing)\\b"]
+        expected_answer: The liquid metal loses heat to the cooler mould and air, so it changes from a liquid into a solid, even though it is still hot.
+        expected_reasoning:
+          - id: loses_heat
+            point: The liquid metal loses heat to its cooler surroundings.
+            patterns:
+              - "(lose|loses|lost|losing|give out|gives out|gave out).{0,20}heat"
+              - "heat.{0,40}(from|out of) the metal"
+        required_points: [loses_heat]
+        demo_answer: The liquid metal loses heat to the cooler mould and air, so it changes from a liquid into a solid.
+
+  - id: matter_008
+    concept: melting_freezing
+    related_concepts: [states_of_matter]
+    difficulty: 2
+    emoji: chocolate_bar
+    prompt: Ravi keeps a chocolate bar in his shorts pocket during a sunny PE lesson. Later, the chocolate is soft and sticky. Explain what happened to the chocolate.
+    answer_patterns: ["melt"]
+    answer_praise: "You noticed that the chocolate changed from hard to soft."
+    expected_answer: The chocolate gained heat from the hot sun and from Ravi's warm body, so it started to melt — changing from a solid into a liquid.
+    expected_reasoning:
+      - id: gains_heat
+        point: The chocolate gains heat from the sun and Ravi's body.
+        patterns:
+          - "(gain|gains|gained|gaining|absorb|absorbs|absorbed|take in|takes in|took in|got|gets).{0,20}heat"
+          - "heat.{0,40}(to|into) the chocolate"
+          - "heat.{0,40}from (the sun|his body|ravi)"
+      - id: melts
+        point: The chocolate melts — it changes from a solid into a liquid.
+        patterns: ["melt", "(solid|hard).{0,30}(liquid|runny)"]
+    required_points: [gains_heat, melts]
+    misconceptions: [cold_added_to_freeze]
+    hints:
+      - In the hot sun, is the chocolate gaining heat or losing heat?
+      - What do we call it when a solid changes into a liquid?
+    demo_answers:
+      misconception: The chocolate became soft because it lost its coldness in the sun.
+      dialogue: The chocolate gained heat from the sun and his body, so it melted.
+      correct: The chocolate gained heat from the hot sun and from Ravi's warm body, so it melted and changed from a solid into a liquid.
+    transfer_questions:
+      - id: matter_008_t1
+        prompt: Mei leaves her ice kachang on the table at a hawker centre. Twenty minutes later, the shaved ice has turned into water. Explain why.
+        emoji: ice_cream
+        answer_patterns: ["melt"]
+        expected_answer: The shaved ice gained heat from the warmer surrounding air, so it melted and changed from solid ice into liquid water.
+        expected_reasoning:
+          - id: gains_heat
+            point: The ice gained heat from the warmer surrounding air.
+            patterns:
+              - "(gain|gains|gained|absorb|absorbs|absorbed|take in|takes in|took in).{0,20}heat"
+              - "heat.{0,40}(to|into) the ice"
+              - "heat.{0,40}from the (warm |warmer )?(air|surround)"
+          - id: melts
+            point: The ice melted into liquid water.
+            patterns: ["melt"]
+        required_points: [gains_heat, melts]
+        demo_answer: The ice gained heat from the warmer air around it, so it melted into liquid water.
+      - id: matter_008_t2
+        prompt: When Siti lights a candle, the wax near the flame turns into a clear liquid. Explain why.
+        emoji: candle
+        answer_patterns: ["melt"]
+        expected_answer: The wax near the flame gains heat from the flame, so it melts and changes from a solid into a liquid.
+        expected_reasoning:
+          - id: gains_heat
+            point: The wax gains heat from the flame.
+            patterns:
+              - "(gain|gains|gained|absorb|absorbs|absorbed|take in|takes in|took in).{0,20}heat"
+              - "heat.{0,40}(to|into) the wax"
+              - "heat.{0,40}from the flame"
+          - id: melts
+            point: The wax melts from a solid into a liquid.
+            patterns: ["melt"]
+        required_points: [gains_heat, melts]
+        demo_answer: The wax gains heat from the flame, so it melts from a solid into a liquid.

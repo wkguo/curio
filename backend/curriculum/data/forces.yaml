@@ -1,0 +1,875 @@
+# Curio curriculum pack — Forces (Singapore Primary Science, P5–P6 "Interactions" theme)
+#
+# Schema notes (validated by curriculum/loader.py -> schemas/curriculum.py):
+#   * `keywords` / `patterns` are case-insensitive Python regular expressions.
+#     A reasoning point is "hit" when ANY of its patterns matches the student's text.
+#   * `teaching` blocks are keyed by TeachingStrategy names. Each strategy holds
+#     chat bubbles (`messages`) and an optional Socratic `follow_up` question.
+#   * `resolution_patterns` on a misconception detect when the student has fixed
+#     the idea during the teaching dialogue.
+
+topic_id: forces
+name: Forces
+subject: Primary Science
+level: Primary 5–6
+theme: Interactions
+syllabus_ref: "MOE Primary Science Syllabus (2023) · Interactions · Forces (approximate mapping, pending teacher review)"
+emoji: magnet
+color: "#3D7BF5"
+tagline: What makes things move, stop, or change shape?
+description: >
+  Discover pushes and pulls all around you — gravity, friction, magnets and
+  springs — and find out why a moving ball does not need a push to keep going.
+
+concepts:
+  - id: what_is_force
+    name: What Is a Force?
+    emoji: shopping_cart
+    learning_objective: Describe a force as a push or a pull, and recognise that forces can act by contact or at a distance.
+    mastery_criterion: "Identifies, in a new everyday situation, the push or pull acting on an object and explains whether it needs contact (like friction) or acts at a distance (like gravity or magnetic force)."
+    summary: A force is a push or a pull. We cannot see forces, but we can see what they do.
+    prerequisites: []
+    key_ideas:
+      - A force is a push or a pull.
+      - Some forces need contact (friction, a kick); some act at a distance (gravity, magnetic force).
+    position: {x: 0, y: 0}
+
+  - id: force_and_motion
+    name: Forces & Motion
+    emoji: soccer_ball
+    learning_objective: Explain that a force can make an object start moving, stop, speed up, slow down, change direction or change shape.
+    mastery_criterion: "Explains, in a new everyday situation, that a moving object keeps moving without a continuous push and slows down or stops because forces such as friction act against it."
+    summary: Forces change how things move. A moving object keeps moving unless a force like friction slows it down.
+    prerequisites: [what_is_force]
+    key_ideas:
+      - Forces can change an object's speed, direction of motion or shape.
+      - A moving object does NOT need a continuous push to keep moving.
+      - Moving things slow down and stop because forces such as friction act against them.
+    position: {x: 0, y: 1}
+
+  - id: magnetic_force
+    name: Magnetic Force
+    emoji: magnet
+    learning_objective: Explain that magnets attract only magnetic materials such as iron, steel, nickel and cobalt, and that the force can act at a distance.
+    mastery_criterion: "Predicts, for a new set of objects, which ones a magnet attracts, and explains that only magnetic materials such as iron and steel are attracted, not all metals."
+    summary: Magnets pull on magnetic materials like iron and steel — even without touching them.
+    prerequisites: [what_is_force]
+    key_ideas:
+      - Magnets attract magnetic materials such as iron, steel, nickel and cobalt.
+      - Not all metals are magnetic — aluminium and copper are not.
+      - Like poles repel; unlike poles attract.
+    position: {x: -2, y: 1}
+
+  - id: elastic_spring_force
+    name: Elastic Spring Force
+    emoji: basketball
+    learning_objective: Explain that a stretched or compressed spring or rubber band exerts an elastic spring force as it tries to return to its original shape.
+    mastery_criterion: "Explains, in a new everyday situation, that a stretched or squashed spring or rubber band exerts an elastic spring force as it returns to its original shape, and that more stretch gives a bigger force."
+    summary: When you stretch or squash a spring, it pushes or pulls back to get its shape back.
+    prerequisites: [what_is_force]
+    key_ideas:
+      - A stretched or squashed spring exerts an elastic spring force.
+      - The more a spring is stretched or squashed, the bigger the elastic spring force.
+    position: {x: 2, y: 1}
+
+  - id: gravity
+    name: Gravity
+    emoji: apple
+    learning_objective: Explain that gravity is a pull of the Earth on all objects, and that without air resistance objects fall at the same rate regardless of mass.
+    mastery_criterion: "Predicts, for two objects of different mass dropped together in a new setting, that they land at about the same time when air resistance is small, and explains this using gravity."
+    summary: Gravity pulls everything towards the Earth. Heavy and light objects fall at the same rate when air resistance is small.
+    prerequisites: [force_and_motion]
+    key_ideas:
+      - Gravity is a non-contact force that pulls objects towards the Earth.
+      - A heavier object does not fall faster when air resistance is very small.
+      - Air resistance slows down light, wide objects like feathers and paper.
+    position: {x: -1, y: 2}
+
+  - id: friction
+    name: Friction
+    emoji: bicycle
+    learning_objective: Explain that friction is a force that opposes motion between surfaces in contact, and that it can be both useful and a problem.
+    mastery_criterion: "Explains, in a new everyday situation, how more or less friction helps or hinders, showing that friction can be useful (gripping, braking) and is not always a problem."
+    summary: Friction acts when two surfaces rub. It slows things down — and it also helps us walk, grip and brake.
+    prerequisites: [force_and_motion]
+    key_ideas:
+      - Friction opposes motion between two surfaces in contact.
+      - Rough surfaces give more friction; smooth surfaces give less.
+      - Friction is useful for walking, gripping and braking, but it also causes wear and heat.
+    position: {x: 1, y: 2}
+
+  - id: weight_vs_mass
+    name: Weight & Mass
+    emoji: globe
+    learning_objective: Distinguish mass (amount of matter, in kg) from weight (the pull of gravity on an object, in newtons).
+    mastery_criterion: "Explains, for an object taken to a place with weaker or stronger gravity, that its mass stays the same while its weight changes."
+    summary: Mass is how much matter something has. Weight is how hard gravity pulls on it.
+    prerequisites: [gravity]
+    key_ideas:
+      - Mass is the amount of matter in an object, measured in kilograms (kg).
+      - Weight is the force of gravity on an object, measured in newtons (N).
+      - On the Moon your mass stays the same, but your weight is less.
+    position: {x: -1, y: 3}
+
+misconceptions:
+  - id: force_needed_to_keep_moving
+    concept: force_and_motion
+    type: CAUSAL_ERROR
+    label: Force vs Motion
+    statement: A moving object needs a continuous force to keep moving, and it stops when the force "runs out".
+    corrective_target: A moving object keeps moving unless a force acts on it. It slows down and stops because friction (and air resistance) act against its motion.
+    nudge: "The ball kept rolling after Ravi's foot left it. Let's find out what really made it stop."
+    patterns:
+      - "(need|needs|needed) (a |some |more )?(force|push|pull).{0,30}(keep|keeps|to move|moving|going|rolling)"
+      - "(force|push|kick|energy).{0,25}(ran out|runs out|run out|used up|wore off|wears off|finished|is gone|was gone)"
+      - "(stop|stops|stopped).{0,20}because.{0,30}(no more|nobody|no one|stopped) (push|pushing|kick|kicking|force)"
+      - "(no|without) (more )?(force|push).{0,20}(so )?(it )?(stop|stops|stopped)"
+      - "(force|push).{0,20}(stays|stay|still|is stored|stored) (inside|in) (the )?(ball|it)"
+    resolution_patterns:
+      - "friction"
+      - "(keep|keeps|continue|continues) (on )?(moving|rolling|going|sliding).{0,40}(unless|until|if nothing|if no)"
+      - "(nothing|no force).{0,30}(stop|stops|slow|slows)"
+      - "air resistance"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Interesting idea! Let's test it. 🧪
+          - Imagine Ravi kicks the ball just as hard, but this time on a super-smooth ice rink.
+          - On ice, the ball glides much, **much** further — even though the kick was exactly the same!
+        follow_up: If the push "ran out" at the same moment, why does the ball travel further on ice than on grass?
+      SOCRATIC_QUESTION:
+        messages:
+          - Let's think like a scientist. 🔍
+          - Once the ball leaves Ravi's foot, is his foot still pushing it?
+          - So what else is touching the ball as it rolls across the field?
+        follow_up: What could the grass be doing to the rolling ball?
+      DIRECT_HINT:
+        messages:
+          - Here's a hint 💡 — a moving object keeps moving unless a force acts on it.
+          - When the ball rolls on grass, the grass rubs against it. That rubbing force is called **friction**.
+        follow_up: What does friction do to the rolling ball?
+      ANALOGY:
+        messages:
+          - Think about sliding along the smooth floor in socks. 🧦
+          - You don't need someone pushing you the whole time — you slide by yourself until the floor slows you down.
+        follow_up: So what slows the ball down on the field?
+    confirm:
+      - Yes! 🎉 The ball doesn't need a push to keep moving.
+      - It stops because **friction** from the grass acts against it and slows it down.
+
+  - id: heavier_falls_faster
+    concept: gravity
+    type: FACTUAL_ERROR
+    label: Heavier falls faster
+    statement: Heavier objects always fall faster than lighter objects.
+    corrective_target: When air resistance is very small, gravity makes heavy and light objects fall at the same rate, so they land at the same time.
+    nudge: "Weight might not change how fast things fall. Let's test this idea together."
+    patterns:
+      - "heavier (one |ball |object |thing |things |objects |ones )?(will )?(fall|falls|drop|drops|land|lands|reach|reaches|hit|hits|touch|touches)( the (ground|floor))? ?(faster|first|quicker|sooner|earlier)"
+      - "(heavy|heavier) (things|objects|ones) (always )?(fall|drop) (faster|first|quicker)"
+      - "(because|as|since) (it is|it's|its) heavier"
+      - "(more|bigger) (mass|weight).{0,20}(fall|falls|drop|drops|land|lands) (faster|first|quicker)"
+      - "(cos|cuz|because|since|as) (it|the \\w+) (is|was) heavier"
+      - "heavier.{0,40}(faster|first|quicker)"
+    resolution_patterns:
+      - "same time"
+      - "(same|equal) (speed|rate)"
+      - "(land|lands|reach|reaches|hit|hits|fall|falls).{0,20}together"
+      - "air resistance"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Let's try an experiment in our heads! 🧪
+          - Drop two identical water bottles side by side. They fall together, right?
+          - Now tape them together into one heavier "double bottle". Would taping suddenly make them zoom down faster?
+        follow_up: So does being heavier really make something fall faster?
+      SIMPLER_EXPLANATION:
+        messages:
+          - Gravity pulls harder on the heavier ball. 🌍
+          - But the heavier ball is also harder to get moving. These two things balance out!
+          - So both balls speed up in the same way as they fall.
+        follow_up: Which ball do you think reaches the ground first now?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — when air resistance is very small, all objects fall at the same rate, no matter how heavy they are.
+        follow_up: So which ball lands first — or do they land together?
+    confirm:
+      - Spot on! 🎉 Both balls land at about the **same time**.
+      - Gravity makes them fall at the same rate. Being heavier does not make a ball fall faster.
+
+  - id: friction_always_bad
+    concept: friction
+    type: OVERGENERALIZATION
+    label: Friction always bad
+    statement: Friction is always bad and we should get rid of it.
+    corrective_target: Friction can be useful — it lets tyres and shoes grip the ground and lets brakes stop a bicycle. It is only a problem in some situations.
+    nudge: "Friction slows things down, but could it also be helping us sometimes? Let's explore."
+    patterns:
+      - "friction is (always |just |only )?(bad|useless|a problem|not useful|not good|not helpful)"
+      - "(no|without|zero) friction.{0,30}(better|easier|best|good|faster)"
+      - "(smooth|smoother) (tyres|tires|shoes|soles).{0,30}(better|best|good|faster)"
+      - "friction (only|just|always) (slows|slow) (things |us |you |it )?down"
+    resolution_patterns:
+      - "(need|needs|needed).{0,20}friction"
+      - "grip"
+      - "friction.{0,40}(help|helps|useful|stop|stops|prevent|prevents|brake)"
+      - "(slip|slide|skid)"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Let's test that idea! 🧪
+          - Imagine the floor of the hawker centre is covered in cooking oil. There is almost **no friction**.
+          - Your feet would slide everywhere — you could hardly walk!
+        follow_up: So is friction always bad, or does it sometimes help us?
+      SOCRATIC_QUESTION:
+        messages:
+          - What happens when Ravi squeezes the brakes on his bicycle? 🚲
+          - The brake pads rub against the wheel. Which force is that?
+        follow_up: Could the bicycle stop safely if there were no friction at all?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — friction can be **useful**. It helps shoes grip the floor and brakes stop a bicycle.
+        follow_up: How do the grooves on a tyre change the friction between the tyre and the road?
+    confirm:
+      - Great thinking! ✨ Friction is not always bad.
+      - The grooves **increase friction**, so the tyres grip the road and don't slip.
+
+  - id: magnets_attract_all_metals
+    concept: magnetic_force
+    type: OVERGENERALIZATION
+    label: Magnets and metals
+    statement: Magnets attract all metals.
+    corrective_target: Magnets only attract magnetic materials such as iron, steel, nickel and cobalt. Many metals, like aluminium and copper, are not magnetic.
+    nudge: "Aluminium and copper are metals too. Let's check whether a magnet really pulls on them."
+    patterns:
+      - "(?<!not )\\b(all|any|every) (kinds? of |types? of )?metals?"
+      - "(all|every) (of )?(the )?(things|objects|items|them|four).{0,30}(because|since|as).{0,20}metal"
+      - "(because|since) (it is|it's|they are|they're) (all )?(made of )?metals?"
+      - "magnets? (can )?(attract|attracts|pick up|picks up|stick to|sticks to) (any|all|every) "
+      - "(?<!not )(?<!only )\\bmagnets? (attract|attracts|pull|pulls|pick up|picks up|stick to|sticks to) metals?\\b"
+    resolution_patterns:
+      - "(only|just) (some|certain) metals"
+      - "not (all|every) metals?"
+      - "(aluminium|aluminum|copper|gold|silver|brass).{0,40}(not|isn't|aren't|cannot|can't|won't)"
+      - "magnetic materials?"
+      - "(iron|steel|nickel|cobalt)"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Let's test it! 🧲
+          - Hold a magnet next to an aluminium drink can. Nothing happens!
+          - Aluminium **is** a metal, but the magnet does not attract it.
+        follow_up: So does a magnet attract every metal, or only some metals?
+      DIRECT_HINT:
+        messages:
+          - "Here's a hint 💡 — magnets only attract **magnetic materials**: iron, steel, nickel and cobalt."
+          - Copper and aluminium are metals too, but they are not magnetic.
+        follow_up: Which of Siti's objects are made of iron or steel?
+      SIMPLER_EXPLANATION:
+        messages:
+          - Magnets are picky! 😄
+          - They only pull on a few special metals — mostly iron and steel. Other metals are simply ignored.
+        follow_up: Which objects would a picky magnet choose?
+    confirm:
+      - Exactly! 🎉 Magnets only attract **magnetic materials** like iron and steel.
+      - Not all metals are magnetic — aluminium and copper are not.
+
+  - id: mass_changes_with_gravity
+    concept: weight_vs_mass
+    type: VOCABULARY_CONFUSION
+    label: Mass vs Weight
+    statement: Mass and weight are the same thing, so an object's mass changes when gravity changes.
+    corrective_target: Mass is the amount of matter and stays the same everywhere. Weight is the pull of gravity, so it changes when gravity is weaker or stronger.
+    nudge: "Mass and weight sound alike, but they may not be the same thing. Let's untangle them."
+    patterns:
+      - "mass (will )?(also )?(becomes?|gets?|goes?|be|is) (less|lower|smaller|lighter|down)"
+      - "mass (will )?(also )?(decrease|decreases|drop|drops|reduce|reduces|change|changes)"
+      - "(weight and mass|mass and weight) (are|is) the same"
+      - "(weight|mass) is the same (thing )?as (the |his |its )?(mass|weight)"
+      - "(less|fewer) (kg|kilograms)"
+    resolution_patterns:
+      - "mass.{0,30}(same|not change|doesn't change|does not change|stay|stays|unchanged)"
+      - "amount of (matter|stuff)"
+      - "(only|just) (his |its |the )?weight"
+    teaching:
+      ANALOGY:
+        messages:
+          - Think of mass as how much "stuff" you are made of. 🧱
+          - Weight is how hard gravity pulls on that stuff.
+          - When the astronaut flies to the Moon, none of his stuff disappears — but the Moon pulls on it more gently.
+        follow_up: So on the Moon, which one changes — his mass or his weight?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — **mass** is the amount of matter, measured in kg. **Weight** is the pull of gravity, measured in newtons.
+        follow_up: Does the amount of matter in the astronaut change when he goes to the Moon?
+      PREREQUISITE_REVIEW:
+        messages:
+          - Let's go back one step to gravity. 🌍
+          - The Moon is much smaller than Earth, so its pull of gravity is weaker — about one-sixth as strong.
+        follow_up: If gravity pulls more gently, what happens to weight? Does the amount of stuff change?
+    confirm:
+      - Brilliant! 🚀 His **mass** stays at 60 kg.
+      - Only his **weight** becomes less, because the Moon's gravity is weaker.
+
+
+  - id: force_needs_contact
+    concept: what_is_force
+    type: OVERGENERALIZATION
+    label: Forces need touching
+    statement: A force can only act when two objects are touching.
+    corrective_target: Some forces, such as gravity and magnetic force, act without touching. They are non-contact forces that act at a distance.
+    nudge: "Nothing is touching it, yet it still starts to move. Let's find out what could be pulling it."
+    patterns:
+      - "(no|not a|not any|isn't a|isn't any) force.{0,40}(touch|contact)"
+      - "(touch|touching|touches|touched|contact).{0,40}(so|so there is|so there's|that's why) (there is |there's )?(no|not a|not any) force"
+      - "(?<!not )(?<!n't )\\b(need|needs|must|has to|have to) (to )?(touch|be touching|be in contact)"
+      - "only (act|acts|work|works|happen|happens) (when|if).{0,30}(touch|contact)"
+    resolution_patterns:
+      - "gravity"
+      - "non-?contact"
+      - "(without|no need to|not need to|n't need to|don't have to|doesn't have to) (touch|touching|be touching|contact)"
+      - "at a distance"
+      - "magnetic force"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Let's test that idea! 🧲
+          - Hold a magnet just above a steel paper clip. The clip jumps up to the magnet — but nothing touched it!
+          - Something must have pulled the clip. That pull is a force.
+        follow_up: So can a force act without touching?
+      SOCRATIC_QUESTION:
+        messages:
+          - Let's think like a scientist. 🔍
+          - A force can make something start moving. Before it falls, the mango is not moving at all.
+          - Then it starts to fall, faster and faster.
+        follow_up: Something is changing how the mango moves. What could be pulling it towards the ground?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — some forces need touching, like a kick or friction. Others act at a distance, like **gravity** and **magnetic force**.
+        follow_up: Which force pulls a falling object towards the Earth?
+    confirm:
+      - Yes! 🎉 **Gravity** pulls the object down, even though nothing touches it.
+      - Gravity and magnetic force are **non-contact forces** — they act at a distance.
+
+questions:
+  - id: forces_001
+    concept: force_and_motion
+    related_concepts: [what_is_force, friction]
+    difficulty: 2
+    emoji: soccer_ball
+    prompt: Ravi kicks a football across the school field. After it leaves his foot, the ball keeps rolling, then slows down and stops. Why does the ball stop?
+    answer_patterns: ["friction", "slow", "grass"]
+    answer_praise: "You noticed that the ball slows down by itself after the kick."
+    expected_answer: The ball keeps moving on its own after the kick. Friction between the ball and the grass acts against its motion and slows it down until it stops.
+    expected_reasoning:
+      - id: keeps_moving
+        point: A moving ball keeps moving on its own; it does not need a continuous push.
+        patterns:
+          - "(keep|keeps|continue|continues).{0,20}(moving|rolling|going)"
+          - "on its own|by itself"
+          - "(does not|doesn't|don't|do not) need.{0,20}(force|push)"
+      - id: friction_slows
+        point: Friction between the ball and the grass slows the ball down.
+        patterns:
+          - "friction"
+          - "(grass|ground|field).{0,30}(slow|slows|rub|rubs)"
+    required_points: [friction_slows]
+    misconceptions: [force_needed_to_keep_moving]
+    hints:
+      - Is Ravi's foot still touching the ball while it rolls?
+      - What is rubbing against the ball as it rolls on the grass?
+    demo_answers:
+      misconception: The ball stops because the force from Ravi's kick runs out. It needs a force to keep moving.
+      dialogue: Friction from the grass slows the ball down until it stops.
+      correct: After the kick, the ball keeps rolling on its own. Friction between the ball and the grass acts against its motion and slows it down until it stops.
+    transfer_questions:
+      - id: forces_001_t1
+        prompt: Siti slides a hockey puck on an ice rink. It glides much further than when she slides it on the carpet at home. Why?
+        emoji: ice_skate
+        answer_patterns: ["friction", "smooth"]
+        expected_answer: The ice is very smooth, so there is much less friction acting against the puck to slow it down.
+        expected_reasoning:
+          - id: less_friction
+            point: Smooth ice gives less friction, so the puck is slowed down less.
+            patterns:
+              - "(less|little|smaller|lower|not much|very little) friction"
+              - "friction.{0,20}(less|smaller|lower)"
+              - "smooth"
+        required_points: [less_friction]
+        demo_answer: The ice is very smooth, so there is less friction to slow the puck down.
+      - id: forces_001_t2
+        prompt: Ahmad gives a toy car one push along the classroom floor. It rolls, then slowly stops. Does someone need to keep pushing it for it to keep rolling? What makes it stop?
+        emoji: car
+        answer_patterns: ["friction"]
+        expected_answer: No. The car keeps rolling by itself after the push, but friction between the wheels and the floor slows it down until it stops.
+        expected_reasoning:
+          - id: keeps_moving
+            point: The car keeps rolling without a continuous push.
+            patterns:
+              - "(keep|keeps|continue|continues).{0,20}(moving|rolling|going)"
+              - "on its own|by itself"
+          - id: friction_slows
+            point: Friction slows the car down.
+            patterns: ["friction"]
+        required_points: [keeps_moving, friction_slows]
+        demo_answer: No. The car keeps rolling by itself after the push, but friction between the wheels and the floor slows it down until it stops.
+
+  - id: forces_002
+    concept: gravity
+    related_concepts: [force_and_motion, weight_vs_mass]
+    difficulty: 2
+    emoji: rock
+    prompt: From the second-floor corridor, Ahmad drops a heavy metal ball and a lighter wooden ball of the same size at the same time. Which ball reaches the ground first? Explain.
+    answer_patterns: ["same time", "together", "both"]
+    answer_praise: "You noticed that gravity pulls both balls down towards the ground."
+    expected_answer: Both balls reach the ground at about the same time. Gravity makes them fall at the same rate, and air resistance is very small for both.
+    expected_reasoning:
+      - id: same_time
+        point: Both balls land at about the same time.
+        patterns:
+          - "same time"
+          - "(land|lands|reach|reaches|hit|hits).{0,20}together"
+          - "(same|equal) (speed|rate)"
+      - id: gravity_same_rate
+        point: Gravity makes objects fall at the same rate regardless of how heavy they are (when air resistance is small).
+        patterns:
+          - "gravity"
+          - "(weight|mass|heav).{0,40}(does not|doesn't|not) (matter|change|make)"
+          - "air resistance"
+    required_points: [same_time]
+    misconceptions: [heavier_falls_faster]
+    hints:
+      - Gravity pulls on both balls. Does being heavier really make a ball fall faster?
+      - Both balls are the same size and shape. Is air resistance very different for them?
+    demo_answers:
+      misconception: The metal ball lands first because heavier things fall faster.
+      dialogue: Oh, they land at the same time because air resistance is tiny for both balls.
+      correct: Both balls land at about the same time. Gravity pulls both down and they fall at the same rate, even though one is heavier.
+    transfer_questions:
+      - id: forces_002_t1
+        prompt: At the playground, Siti holds a basketball and a tennis ball at the top of the slide and lets go of both at the same time. Which reaches the ground first?
+        emoji: basketball
+        answer_patterns: ["same time", "together", "both"]
+        expected_answer: They reach the ground at about the same time, because gravity makes them fall at the same rate.
+        expected_reasoning:
+          - id: same_time
+            point: Both balls reach the ground at about the same time.
+            patterns:
+              - "same time"
+              - "(land|lands|reach|reaches|hit|hits).{0,20}together"
+              - "(same|equal) (speed|rate)"
+        required_points: [same_time]
+        demo_answer: They reach the ground at the same time because gravity makes them fall at the same rate.
+
+      - id: forces_002_t2
+        prompt: On a field trip, Ahmad drops a big stone and a small pebble from the top of a low wall at the same time. Which one hits the ground first? Explain.
+        emoji: rock
+        answer_patterns: ["same time", "together", "both"]
+        expected_answer: They hit the ground at about the same time, because gravity makes them fall at the same rate even though the big stone is heavier.
+        expected_reasoning:
+          - id: same_time
+            point: Both reach the ground at about the same time.
+            patterns:
+              - "same time"
+              - "(land|lands|reach|reaches|hit|hits).{0,20}together"
+              - "(same|equal) (speed|rate)"
+        required_points: [same_time]
+        demo_answer: They hit the ground at the same time, because gravity makes them fall at the same rate even though the stone is heavier.
+
+  - id: forces_003
+    concept: friction
+    related_concepts: [force_and_motion]
+    difficulty: 2
+    emoji: bicycle
+    prompt: "Ravi's friend says: \"Friction is always bad. Bicycle tyres should be totally smooth!\" Ravi disagrees. Why do bicycle tyres have grooves on them?"
+    answer_patterns: ["friction", "grip", "slip"]
+    answer_praise: "You noticed that the grooves change how the tyres touch the road."
+    expected_answer: The grooves increase friction between the tyres and the road, so the tyres grip the road and do not slip, especially when braking. Friction is useful here.
+    expected_reasoning:
+      - id: more_friction
+        point: The grooves increase friction between the tyre and the road.
+        patterns:
+          - "(more|increase|increases|increased|greater|bigger) friction"
+          - "friction.{0,20}(more|increase|greater)"
+      - id: friction_useful
+        point: This friction is useful — it helps the tyres grip and stops them slipping.
+        patterns:
+          - "grip"
+          - "(slip|skid|slide)"
+          - "friction.{0,40}(help|helps|useful|stop|stops|brake|brakes)"
+    required_points: [more_friction, friction_useful]
+    misconceptions: [friction_always_bad]
+    hints:
+      - What would happen if Ravi rode on a wet road with totally smooth tyres?
+      - Do grooves make the tyre surface rougher or smoother?
+    demo_answers:
+      misconception: I agree with the friend. Friction is always bad because it slows the bicycle down, so smooth tyres are better.
+      dialogue: Maybe we need friction so the tyres grip the road and don't slip.
+      correct: I disagree. The grooves increase friction between the tyres and the road, so the tyres grip the road and do not slip, especially when braking.
+    transfer_questions:
+      - id: forces_003_t1
+        prompt: Ahmad's school shoes have rubber soles with deep patterns. Why is this useful when he walks on the wet floor of a hawker centre?
+        emoji: droplet
+        answer_patterns: ["friction", "grip", "slip"]
+        expected_answer: The patterns increase friction between the shoes and the floor, so the shoes grip the wet floor and Ahmad does not slip.
+        expected_reasoning:
+          - id: friction_grip
+            point: The patterned soles increase friction so the shoes grip and do not slip.
+            patterns: ["friction", "grip", "(slip|slide|skid)"]
+        required_points: [friction_grip]
+        demo_answer: The patterns on the rubber soles increase friction, so his shoes grip the wet floor and he does not slip.
+
+      - id: forces_003_t2
+        prompt: Mei cannot open a tight jar lid because her hands are wet and soapy. Her dad wraps a rubber cloth around the lid and opens it easily. How does the rubber cloth help?
+        emoji: jar
+        answer_patterns: ["friction", "grip", "slip"]
+        expected_answer: The rubber cloth increases friction between the hand and the lid, so the hand can grip the lid without slipping.
+        expected_reasoning:
+          - id: friction_grip
+            point: The rubber cloth increases friction so the hand grips the lid and does not slip.
+            patterns: ["friction", "grip", "(slip|slide|skid)"]
+        required_points: [friction_grip]
+        demo_answer: The rubber cloth increases friction between his hand and the lid, so his hand can grip the lid without slipping.
+
+  - id: forces_004
+    concept: magnetic_force
+    related_concepts: [what_is_force]
+    difficulty: 2
+    emoji: paperclip
+    prompt: Siti holds a magnet near four objects — a steel paper clip, an aluminium drink can, a copper wire and an iron nail. Which objects will the magnet attract? Explain.
+    answer_patterns: ["paper ?clip", "nail", "steel", "iron"]
+    answer_praise: "You noticed that the magnet only pulls on some of the objects."
+    expected_answer: Only the steel paper clip and the iron nail, because magnets only attract magnetic materials like iron and steel. Aluminium and copper are metals but are not magnetic.
+    expected_reasoning:
+      - id: attracted_items
+        point: The steel paper clip and the iron nail are attracted.
+        patterns:
+          - "paper ?clip.{0,40}nail"
+          - "nail.{0,40}paper ?clip"
+          - "(iron and steel|steel and iron)"
+      - id: not_all_metals
+        point: Not all metals are magnetic — aluminium and copper are not attracted.
+        patterns:
+          - "not (all|every) metals?"
+          - "(only|just) (some|certain) metals"
+          - "(aluminium|aluminum|copper).{0,50}(not|isn't|aren't|cannot|can't|won't)"
+      - id: magnetic_materials
+        point: Magnets only attract magnetic materials (iron, steel, nickel, cobalt).
+        patterns: ["magnetic material", "(iron|steel|nickel|cobalt)"]
+    required_points: [attracted_items, not_all_metals]
+    misconceptions: [magnets_attract_all_metals]
+    hints:
+      - Is every metal a magnetic material?
+      - Which of the four objects are made of iron or steel?
+    demo_answers:
+      misconception: All four, because magnets attract all metals.
+      dialogue: Oh, only some metals are magnetic, like iron and steel.
+      correct: Only the steel paper clip and the iron nail are attracted. Magnets only attract magnetic materials like iron and steel. Aluminium and copper are metals, but they are not magnetic.
+    transfer_questions:
+      - id: forces_004_t1
+        prompt: At a recycling centre, a big magnet is used to separate steel cans from aluminium cans. Why does this work?
+        emoji: magnet
+        answer_patterns: ["steel", "alumini?um", "magnet"]
+        expected_answer: The magnet attracts the steel cans because steel is a magnetic material. Aluminium is not magnetic, so the aluminium cans are left behind.
+        expected_reasoning:
+          - id: steel_magnetic
+            point: Steel is a magnetic material, so the magnet attracts the steel cans.
+            patterns:
+              - "steel.{0,40}(magnetic|attract)"
+              - "(attract|attracts|pick up|picks up|pulls).{0,30}steel"
+          - id: aluminium_not
+            point: Aluminium is not magnetic, so aluminium cans are not attracted.
+            patterns: ["(aluminium|aluminum).{0,50}(not|isn't|aren't|cannot|can't|won't|no)"]
+        required_points: [steel_magnetic, aluminium_not]
+        demo_answer: The magnet attracts the steel cans because steel is a magnetic material, but aluminium is not magnetic, so the aluminium cans are left behind.
+
+      - id: forces_004_t2
+        prompt: A fridge magnet sticks to the steel door of Siti's fridge, but it will not stick to the aluminium window frame. Both are metals. Why is there a difference?
+        emoji: magnet
+        answer_patterns: ["steel", "alumini?um", "magnetic"]
+        expected_answer: Steel is a magnetic material, so the magnet is attracted to the fridge door. Aluminium is a metal but it is not magnetic, so the magnet does not stick to the window frame.
+        expected_reasoning:
+          - id: steel_magnetic
+            point: Steel is a magnetic material, so the magnet is attracted to it.
+            patterns:
+              - "steel.{0,40}(magnetic|attract)"
+              - "(attract|attracts|attracted|stick|sticks).{0,30}steel"
+          - id: aluminium_not
+            point: Aluminium is not magnetic, so the magnet does not stick to it.
+            patterns: ["(aluminium|aluminum).{0,50}(not|isn't|aren't|cannot|can't|won't|no)"]
+        required_points: [steel_magnetic, aluminium_not]
+        demo_answer: The fridge door is made of steel, which is a magnetic material, so the magnet sticks. Aluminium is a metal but it is not magnetic, so the magnet does not stick to the window frame.
+
+  - id: forces_005
+    concept: elastic_spring_force
+    related_concepts: [what_is_force, force_and_motion]
+    difficulty: 3
+    emoji: rocket
+    prompt: Mei pulls back the rubber band on a toy launcher and lets go. Her paper plane shoots forward. What made the plane move? What would happen if she stretched the rubber band further?
+    answer_patterns: ["rubber band", "elastic", "stretch"]
+    answer_praise: "You noticed that the rubber band has something to do with the plane moving."
+    expected_answer: The stretched rubber band exerts an elastic spring force as it returns to its original shape, pushing the plane forward. Stretching it further gives a bigger elastic force, so the plane flies further.
+    expected_reasoning:
+      - id: elastic_force
+        point: The stretched rubber band exerts an elastic spring force as it returns to its original shape.
+        patterns:
+          - "elastic"
+          - "(rubber band|band).{0,40}(push|pushes|pushed|pull|pulls|pulled|return|returns|go back|goes back|went back|spring back|springs back|original shape)"
+      - id: more_stretch
+        point: Stretching it more gives a bigger force, so the plane goes further.
+        patterns:
+          - "(bigger|greater|larger|stronger|more) (elastic )?(spring )?(force|push|pull)"
+          - "force is (bigger|greater|larger|stronger)"
+          - "(fly|flies|go|goes|travel|travels).{0,20}(further|farther)"
+    required_points: [elastic_force, more_stretch]
+    misconceptions: []
+    hints:
+      - What does a stretched rubber band try to do when you let go?
+      - Does a rubber band pull back harder when it is stretched a lot or a little?
+    demo_answers:
+      misconception: The plane moves because Mei's hand threw it.
+      dialogue: The rubber band pulls back to its original shape and pushes the plane.
+      correct: The stretched rubber band exerts an elastic spring force as it goes back to its original shape, and this pushes the plane forward. If she stretches it further, the elastic force is bigger, so the plane flies further.
+    transfer_questions:
+      - id: forces_005_t1
+        prompt: Ravi's bicycle seat has springs under it. When he sits down, the springs get shorter. When he gets off, they become longer again. Explain why.
+        emoji: bicycle
+        answer_patterns: ["spring", "elastic", "shape"]
+        expected_answer: Ravi's weight squashes the springs. The squashed springs exert an elastic spring force that pushes back, so when he gets off they return to their original shape.
+        expected_reasoning:
+          - id: elastic_force
+            point: The squashed springs exert an elastic spring force and return to their original shape.
+            patterns:
+              - "elastic"
+              - "spring force"
+              - "original shape"
+              - "(push|pushes|pushed) (back|up)"
+              - "springs? back"
+        required_points: [elastic_force]
+        demo_answer: When Ravi sits, the springs are squashed. They exert an elastic spring force that pushes back, so when he gets off they spring back to their original shape.
+
+      - id: forces_005_t2
+        prompt: When Ahmad lands on a trampoline, the springs around the edge stretch. Then he is pushed up into the air. What pushes him up? What happens if he lands harder?
+        emoji: playground_slide
+        answer_patterns: ["spring", "elastic", "stretch"]
+        expected_answer: The stretched springs exert an elastic spring force as they return to their original shape, which pushes Ahmad up. Landing harder stretches the springs more, so the elastic spring force is bigger and he goes higher.
+        expected_reasoning:
+          - id: elastic_force
+            point: The stretched springs exert an elastic spring force as they return to their original shape.
+            patterns:
+              - "elastic"
+              - "spring force"
+              - "original shape"
+              - "(pull|pulls|pulled|push|pushes|pushed|pushing) (back|him up|up)"
+          - id: more_stretch
+            point: More stretch gives a bigger force, so he goes higher.
+            patterns:
+              - "(bigger|greater|larger|stronger|more) (elastic )?(spring )?(force|push|pull)"
+              - "force is (bigger|greater|larger|stronger)"
+              - "(higher|further|farther)"
+        required_points: [elastic_force, more_stretch]
+        demo_answer: The stretched springs exert an elastic spring force as they go back to their original shape, pushing him up. If he lands harder, they stretch more, so the force is bigger and he goes higher.
+
+  - id: forces_006
+    concept: weight_vs_mass
+    related_concepts: [gravity]
+    difficulty: 3
+    emoji: globe
+    prompt: An astronaut has a mass of 60 kg on Earth. He travels to the Moon, where gravity is weaker. What happens to his mass and his weight on the Moon?
+    answer_patterns: ["mass", "weight"]
+    answer_praise: "You noticed that something about the astronaut changes on the Moon."
+    expected_answer: His mass stays the same at 60 kg because the amount of matter does not change, but his weight is less because the Moon's gravity is weaker.
+    expected_reasoning:
+      - id: mass_same
+        point: His mass stays the same (60 kg).
+        patterns:
+          - "mass.{0,30}(same|not change|doesn't change|does not change|stay|stays|unchanged|still 60)"
+      - id: weight_less
+        point: His weight is less because the Moon's gravity is weaker.
+        patterns:
+          - "weight.{0,30}(less|lower|smaller|decrease|decreases|lighter|goes down)"
+          - "(weaker|less|smaller) gravity"
+          - "gravity.{0,30}(weaker|less|smaller)"
+    required_points: [mass_same, weight_less]
+    misconceptions: [mass_changes_with_gravity]
+    hints:
+      - Does the astronaut lose any part of his body on the way to the Moon?
+      - Weight is the pull of gravity. What happens to the pull on the Moon?
+    demo_answers:
+      misconception: His mass becomes less on the Moon because weight and mass are the same thing.
+      dialogue: His mass stays the same because he still has the same amount of matter. Only his weight changes.
+      correct: His mass stays the same at 60 kg, but his weight is less because the Moon's gravity is weaker than Earth's.
+    transfer_questions:
+      - id: forces_006_t1
+        prompt: An astronaut brings a 2 kg rock from the Moon back to Earth. Does its mass change? Is its weight on Earth more or less than on the Moon?
+        emoji: rock
+        answer_patterns: ["mass", "weight", "more", "heavier"]
+        expected_answer: Its mass stays the same at 2 kg, but its weight is greater on Earth because Earth's gravity is stronger.
+        expected_reasoning:
+          - id: mass_same
+            point: The rock's mass stays the same (2 kg).
+            patterns:
+              - "mass.{0,30}(same|not change|doesn't change|does not change|stay|stays|unchanged|still 2)"
+          - id: weight_more
+            point: Its weight is greater on Earth because Earth's gravity is stronger.
+            patterns:
+              - "weight.{0,30}(more|greater|bigger|heavier|increase|increases)"
+              - "(stronger|more|greater) gravity"
+              - "gravity.{0,30}(stronger|greater|more)"
+        required_points: [mass_same, weight_more]
+        demo_answer: The mass of the rock stays the same at 2 kg, but its weight is greater on Earth because Earth's gravity is stronger.
+
+      - id: forces_006_t2
+        prompt: Gravity on Mars is weaker than on Earth. A robot rover has a mass of 900 kg on Earth. What happens to its mass and its weight when it lands on Mars?
+        emoji: rocket
+        answer_patterns: ["mass", "weight"]
+        expected_answer: Its mass stays the same at 900 kg because the amount of matter does not change, but its weight is less because the gravity on Mars is weaker.
+        expected_reasoning:
+          - id: mass_same
+            point: The rover's mass stays the same (900 kg).
+            patterns:
+              - "mass.{0,30}(same|not change|doesn't change|does not change|stay|stays|unchanged|still 900)"
+          - id: weight_less
+            point: Its weight is less because gravity on Mars is weaker.
+            patterns:
+              - "weight.{0,30}(less|lower|smaller|decrease|decreases|lighter|goes down)"
+              - "(weaker|less|smaller) gravity"
+              - "gravity.{0,30}(weaker|less|smaller)"
+        required_points: [mass_same, weight_less]
+        demo_answer: Its mass stays the same at 900 kg, but its weight is less because the gravity on Mars is weaker.
+
+  - id: forces_007
+    concept: what_is_force
+    related_concepts: [gravity]
+    difficulty: 2
+    emoji: apple
+    prompt: A ripe mango drops from a tree in Siti's garden. Nothing touches the mango as it falls. Is there a force acting on the mango? Explain.
+    answer_patterns: ["yes", "gravity", "pull"]
+    answer_praise: "You noticed that something makes the mango start to fall."
+    expected_answer: Yes. Gravity, the pull of the Earth, acts on the mango and pulls it down. Gravity is a non-contact force, so it can act without touching the mango.
+    expected_reasoning:
+      - id: force_is_gravity
+        point: The force is gravity — the pull of the Earth on the mango.
+        patterns:
+          - "gravity"
+          - "gravitational"
+          - "earth.{0,20}pull"
+          - "pull.{0,30}(down|towards the (earth|ground))"
+      - id: non_contact
+        point: Gravity acts without touching — it is a non-contact force.
+        patterns:
+          - "non-?contact"
+          - "(without|no need to|not need to|n't need to|doesn't have to|don't have to) (touch|touching|be touching|contact)"
+          - "at a distance"
+          - "(even though|although|even if).{0,30}(nothing|not|no one|nobody).{0,20}touch"
+    required_points: [force_is_gravity, non_contact]
+    misconceptions: [force_needs_contact]
+    hints:
+      - What made the mango start moving down?
+      - Can a magnet pull a paper clip without touching it?
+    demo_answers:
+      misconception: No, there is no force on the mango because nothing is touching it.
+      dialogue: Oh, gravity is pulling the mango down even without touching it.
+      correct: Yes. Gravity is pulling the mango down towards the Earth. Gravity is a non-contact force, so it can act without touching the mango.
+    transfer_questions:
+      - id: forces_007_t1
+        prompt: Ravi holds a magnet a few centimetres above a steel paper clip. The clip jumps up and sticks to the magnet. Did a force act on the clip before it touched the magnet? Explain.
+        emoji: paperclip
+        answer_patterns: ["yes", "magnet", "pull", "attract"]
+        expected_answer: Yes. The magnetic force pulled the clip up before it touched the magnet. Magnetic force is a non-contact force, so it acts at a distance.
+        expected_reasoning:
+          - id: magnetic_pull
+            point: The magnet pulled (attracted) the clip.
+            patterns:
+              - "magnetic force"
+              - "magnet.{0,30}(pull|pulls|pulled|attract|attracts|attracted)"
+              - "(pull|pulls|pulled|attract|attracts|attracted).{0,30}(clip|it)"
+          - id: non_contact
+            point: Magnetic force acts without touching — it is a non-contact force.
+            patterns:
+              - "non-?contact"
+              - "(without|no need to|not need to|n't need to|doesn't have to|don't have to) (touch|touching|be touching|contact)"
+              - "at a distance"
+              - "before (it|they|the clip) (touched|touches|touch)"
+        required_points: [magnetic_pull, non_contact]
+        demo_answer: Yes. The magnet pulled the clip up before they touched, because magnetic force is a non-contact force that acts at a distance.
+      - id: forces_007_t2
+        prompt: During PE, Ahmad throws a ball straight up. After it leaves his hand, nothing touches it, but it slows down, stops and comes back down. Which force does this? Does it need to touch the ball?
+        emoji: basketball
+        answer_patterns: ["gravity", "gravitational"]
+        expected_answer: Gravity. It pulls the ball towards the Earth without touching it, because gravity is a non-contact force.
+        expected_reasoning:
+          - id: force_is_gravity
+            point: Gravity pulls the ball back towards the Earth.
+            patterns: ["gravity", "gravitational"]
+          - id: non_contact
+            point: Gravity acts without touching — it is a non-contact force.
+            patterns:
+              - "non-?contact"
+              - "(without|no need to|not need to|n't need to|doesn't have to|don't have to) (touch|touching|be touching|contact)"
+              - "at a distance"
+        required_points: [force_is_gravity, non_contact]
+        demo_answer: Gravity pulls the ball back down. It does not need to touch the ball, because gravity is a non-contact force.
+
+  - id: forces_008
+    concept: friction
+    related_concepts: [force_and_motion]
+    difficulty: 3
+    emoji: bicycle
+    prompt: "Ravi's bicycle brakes squeak. His friend says: \"Friction is bad. Just put oil on the brake pads so they rub less.\" Is this a good idea? Explain."
+    answer_patterns: ["\\bno\\b", "not a good", "bad idea", "(cannot|can't|unable to) stop"]
+    answer_praise: "You noticed that oiling the brakes is not a good idea."
+    expected_answer: No. The brakes need friction between the brake pads and the wheel to slow the bicycle down and stop it. Oil would reduce the friction, so Ravi might not be able to stop safely. Here, friction is useful.
+    expected_reasoning:
+      - id: brakes_need_friction
+        point: The brakes work by friction between the pads and the wheel, which slows the bicycle down.
+        patterns:
+          - "(brake|brakes|pads).{0,40}friction"
+          - "friction.{0,40}(stop|stops|slow|slows)"
+          - "(need|needs|needed).{0,20}friction"
+      - id: oil_reduces
+        point: Oil reduces friction, so the bicycle cannot stop well.
+        patterns:
+          - "(oil|it).{0,30}(reduce|reduces|less|lower|decrease|decreases).{0,20}friction"
+          - "(less|reduced|lower) friction"
+          - "(cannot|can't|unable to|won't|will not|not be able to).{0,20}stop"
+    required_points: [brakes_need_friction]
+    misconceptions: [friction_always_bad]
+    hints:
+      - How do brake pads make a wheel slow down?
+      - What would oil do to the friction between the pads and the wheel?
+    demo_answers:
+      misconception: Yes, friction is always bad, so oiling the brake pads will make the bicycle better.
+      dialogue: The brakes need friction to slow the wheel down, so oil is a bad idea.
+      correct: No, it is not a good idea. The brakes need friction between the brake pads and the wheel to slow the bicycle down and stop it. Oil would reduce the friction, so Ravi might not be able to stop safely.
+    transfer_questions:
+      - id: forces_008_t1
+        prompt: Mei's friend wants to polish the school hall floor until it is super smooth, so that everyone can run faster. Why could this be dangerous?
+        emoji: school
+        answer_patterns: ["friction", "slip", "grip"]
+        expected_answer: A very smooth floor has less friction, so shoes cannot grip the floor and people may slip and fall. Friction is useful for walking and running.
+        expected_reasoning:
+          - id: less_friction_slip
+            point: Less friction means shoes cannot grip, so people slip.
+            patterns:
+              - "(less|little|lower|reduce|reduces|not much|very little) friction"
+              - "friction.{0,30}(less|lower|smaller)"
+              - "(slip|slide|skid)"
+              - "grip"
+        required_points: [less_friction_slip]
+        demo_answer: A very smooth floor has less friction, so our shoes cannot grip the floor and we may slip and fall.
+      - id: forces_008_t2
+        prompt: A goalkeeper wears gloves with rough rubber palms. How do these gloves help him catch and hold a wet football?
+        emoji: gloves
+        answer_patterns: ["friction", "grip"]
+        expected_answer: The rough rubber palms increase friction between the gloves and the ball, so he can grip the wet ball and it does not slip out of his hands.
+        expected_reasoning:
+          - id: more_friction_grip
+            point: The rough palms increase friction so he can grip the ball without it slipping.
+            patterns:
+              - "(more|increase|increases|increased|greater|bigger) friction"
+              - "friction.{0,20}(more|increase|greater)"
+              - "grip"
+              - "(slip|slide)"
+        required_points: [more_friction_grip]
+        demo_answer: The rough rubber increases friction between the gloves and the ball, so he can grip it and it does not slip.

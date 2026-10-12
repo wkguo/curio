@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+backend/curio.db*
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Local configuration and secrets (copy the .env.example files)
+.env
+.env.*
+!.env.example
+
+# Editors / OS / logs
+.vscode/
+.idea/
+.DS_Store
+*.log
+
+# Demo videos are published as GitHub Release assets, not stored in git
+docs/demo/*.mp4

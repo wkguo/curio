@@ -1,0 +1,664 @@
+# Curio curriculum pack — Heat Transfer (Singapore Primary Science, P5–P6 "Energy" theme)
+#
+# Schema notes (validated by curriculum/loader.py -> schemas/curriculum.py):
+#   * `keywords` / `patterns` are case-insensitive Python regular expressions.
+#     A reasoning point is "hit" when ANY of its patterns matches the student's text.
+#   * `teaching` blocks are keyed by TeachingStrategy names. Each strategy holds
+#     chat bubbles (`messages`) and an optional Socratic `follow_up` question.
+#   * `resolution_patterns` on a misconception detect when the student has fixed
+#     the idea during the teaching dialogue.
+
+topic_id: heat_transfer
+name: Heat Transfer
+subject: Primary Science
+level: Primary 5–6
+theme: Energy
+syllabus_ref: "MOE Primary Science Syllabus (2023) · Energy · Heat (approximate mapping, pending teacher review)"
+emoji: fire
+color: "#F2703A"
+tagline: Why do some things feel hot or cold?
+description: >
+  Explore how heat moves from hotter places to colder places, why metals feel
+  cold to the touch, and how insulators keep things warm or cool.
+
+concepts:
+  - id: temperature
+    name: Temperature
+    emoji: thermometer
+    learning_objective: Describe temperature as a measure of how hot or cold something is, measured with a thermometer in °C.
+    mastery_criterion: "Explains, in a new everyday situation, why touch cannot be trusted to judge temperature, and chooses a thermometer to measure it in °C."
+    summary: Temperature tells us how hot or cold something is. We measure it with a thermometer.
+    prerequisites: []
+    key_ideas:
+      - Temperature is measured in degrees Celsius (°C).
+      - Our sense of touch is not a reliable way to measure temperature.
+    position: {x: 0, y: 0}
+
+  - id: heat_energy
+    name: Heat Energy
+    emoji: fire
+    learning_objective: Explain that heat is a form of energy and that heat and temperature are different.
+    mastery_criterion: "Explains, for two amounts of material at the same temperature, that the larger amount holds more heat energy, so it can melt more ice or stay warm for longer."
+    summary: Heat is energy. Temperature tells us how hot something is; heat is the energy that can flow.
+    prerequisites: [temperature]
+    key_ideas:
+      - Heat is a form of energy.
+      - A big pot of warm water can hold more heat than a cup of hotter water.
+    position: {x: 0, y: 1}
+
+  - id: heat_flow
+    name: Heat Flow
+    emoji: right_arrow
+    learning_objective: Explain that heat flows from a hotter object or region to a colder one until they reach the same temperature.
+    mastery_criterion: "Explains, in a new everyday situation, that heat flows from the hotter object to the colder one until both reach the same temperature, without describing cold as something that flows."
+    summary: Heat always flows from hotter to colder, until both are the same temperature.
+    prerequisites: [heat_energy]
+    key_ideas:
+      - Heat moves from a hotter place to a colder place.
+      - Heat flow stops when both objects reach the same temperature.
+      - '"Cold" is not something that flows — only heat flows.'
+    position: {x: 0, y: 2}
+
+  - id: heat_conduction
+    name: Heat Conduction
+    emoji: spoon
+    learning_objective: Explain that metals conduct heat faster than wood or plastic, so they draw heat from our hands faster and feel colder.
+    mastery_criterion: "Explains, in a new everyday situation, that a metal object feels colder because it conducts heat away from the hand faster, not because it is at a lower temperature."
+    summary: Good conductors like metal let heat pass through them quickly.
+    prerequisites: [heat_flow]
+    key_ideas:
+      - Metals are good conductors of heat.
+      - A good conductor takes heat away from your hand faster, so it feels colder.
+      - Two objects in the same room are at the same temperature.
+    position: {x: -1, y: 3}
+
+  - id: insulation
+    name: Heat Insulators
+    emoji: gloves
+    learning_objective: Explain that poor conductors (insulators) such as wood, plastic, air and cloth slow down heat flow.
+    mastery_criterion: "Explains, in a new everyday situation, that an insulator such as cloth, foam or trapped air slows down heat flow in either direction and does not produce heat itself."
+    summary: Insulators slow down the flow of heat. They keep hot things hot and cold things cold.
+    prerequisites: [heat_flow]
+    key_ideas:
+      - Wood, plastic, cloth, and trapped air are poor conductors of heat.
+      - Insulators slow heat flow in BOTH directions — in and out.
+      - A jacket does not make heat; it slows heat leaving your body.
+    position: {x: 1, y: 3}
+
+  - id: expansion
+    name: Expansion & Contraction
+    emoji: train
+    learning_objective: Explain that most materials expand when they gain heat and contract when they lose heat.
+    mastery_criterion: "Explains, in a new everyday situation, that a material expands when it gains heat and contracts when it loses heat, and uses this to account for what is observed."
+    summary: When things gain heat they expand (get bigger). When they lose heat they contract.
+    prerequisites: [heat_flow]
+    key_ideas:
+      - Solids, liquids and gases expand when heated.
+      - Gaps are left in railway tracks so they can expand on hot days.
+    position: {x: 0, y: 4}
+
+misconceptions:
+  - id: metal_is_colder
+    label: "Metal is colder"
+    nudge: "Both spoons may actually be at the same temperature. Let's investigate why they feel different."
+    concept: heat_conduction
+    type: CAUSAL_ERROR
+    statement: Metal is naturally colder than other materials.
+    corrective_target: Both objects are at room temperature; metal feels colder because it conducts heat away from your hand faster.
+    patterns:
+      - "metal (is|are) (naturally |just |always )?(cold|colder|cooler)"
+      - "metal.{0,30}(lower|less) temperature"
+      - "naturally (cold|colder)"
+      - "metal.{0,20}(has|have|got) (more )?cold"
+      - "metal.{0,25}(colder|cooler) than (the )?wood"
+    resolution_patterns:
+      - "(take|takes|taking|draw|draws|pull|pulls|remove|removes|conduct|conducts|transfer|transfers|move|moves|carry|carries).{0,30}heat"
+      - "heat.{0,30}(away|faster|quicker|quickly|out of)"
+      - "same temperature"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Interesting idea! Let's test it. 🧪
+          - Imagine both spoons stayed in the same room all night. If we put a thermometer on each one in the morning, what do you think it would show?
+          - Here's a clue — the thermometer shows **about the same temperature** for both spoons. So why would one *feel* colder?
+        follow_up: What might be different about how metal and wood deal with the heat from your warm hand?
+      ANALOGY:
+        messages:
+          - Think of heat like water and your hand like a full water bottle. 💧
+          - Touching metal is like pouring into a wide drain — the water rushes out fast. Touching wood is like a tiny straw — it only trickles out.
+          - Your hand notices heat *leaving quickly*, and your brain says "cold!"
+        follow_up: So which spoon lets heat 'drain' out of your hand faster?
+      SOCRATIC_QUESTION:
+        messages:
+          - Let's think like a scientist. 🔍
+          - Both spoons have been sitting in the same room. Would they end up at the same temperature or different temperatures?
+        follow_up: If they are the same temperature, what else could make the metal *feel* colder?
+      DIRECT_HINT:
+        messages:
+          - Here's a hint 💡 — "feeling cold" is really your skin *losing heat*.
+          - Metal is a good conductor of heat. Wood is a poor conductor.
+        follow_up: Which spoon takes heat away from your hand faster?
+      VISUAL_EXPLANATION:
+        visual: heat_flow_hand
+        messages:
+          - Look at the arrows 👀 — heat flows from your warm hand (about 34°C) into the spoon (about 25°C).
+          - The metal spoon has BIG arrows (fast heat flow). The wooden spoon has tiny arrows (slow heat flow).
+        follow_up: Why does the big-arrow spoon feel colder?
+    confirm:
+      - Exactly! 🎉 Metal takes heat away from your hand **faster** than wood.
+      - Both spoons are at the same temperature — the metal just *feels* colder because heat leaves your hand quickly.
+
+  - id: cold_flows
+    label: "Cold flows"
+    nudge: "Only one thing can really flow here. Let's find out which one."
+    concept: heat_flow
+    type: CONCEPT_CONFUSION
+    statement: Cold flows from cold objects into warm objects.
+    corrective_target: Only heat flows, and it flows from hotter to colder. Things cool down because they lose heat.
+    patterns:
+      - "cold(ness)? (flows|moves|goes|travels|enters|spreads)"
+      - "(gives|give|giving|transfer|transfers) (out )?(the )?cold"
+      - "cold (energy|air) (goes|moves) into"
+      - "cold(ness)?\\b.{0,30}\\b(flows?|moves?|goes|go|travels?|enters?|spreads?|passes) (in)?to"
+      - "cold (always )?(moves|goes|flows) to (the )?(hot|warm)"
+    resolution_patterns:
+      - "(lose|loses|losing|lost) heat"
+      - "heat.{0,20}(flow|flows|moves|goes|leaves|transfer).{0,30}(to|into) the (ice|cold|colder|drink|water)"
+      - "heat (flows|moves|goes) from"
+    teaching:
+      ANALOGY:
+        messages:
+          - Cold isn't a "thing" that can travel — it's just *less heat*. ❄️
+          - Think of darkness. Darkness doesn't flow into a room; the room gets dark when light leaves. Cold works the same way with heat!
+        follow_up: So when a drink gets cold with ice, which way is heat really flowing?
+      COUNTEREXAMPLE:
+        messages:
+          - Let's check. If cold could flow, a hot drink would flow "hot" into ice, and ice would flow "cold" into the drink. That's two things flowing!
+          - Scientists found only ONE thing flows — heat — from the hotter object to the colder one.
+        follow_up: Which object is losing heat when ice cools a drink?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — Only heat flows. It always moves from hotter to colder.
+        follow_up: When ice cools a drink, where does the drink's heat go?
+    confirm:
+      - Yes! ✨ Heat flows from the warmer drink into the ice. The drink cools because it **loses heat**.
+
+  - id: jacket_makes_heat
+    label: "Clothes make heat"
+    nudge: "Where does the warmth really come from? Let's check."
+    concept: insulation
+    type: CAUSAL_ERROR
+    statement: A jacket or blanket produces its own heat.
+    corrective_target: Insulators do not produce heat; they slow down heat loss from your body.
+    patterns:
+      - "(jacket|blanket|sweater|coat|cloth|wool).{0,30}(makes|make|produces|produce|gives|give|creates|create|generates) (out )?(heat|warmth|warm)"
+      - "(jacket|blanket|sweater|coat) (is|are) (naturally )?(warm|hot)"
+    resolution_patterns:
+      - "(slow|slows|reduce|reduces|stop|stops|keep|keeps|trap|traps).{0,30}heat"
+      - "poor conductor|insulator"
+    teaching:
+      COUNTEREXAMPLE:
+        messages:
+          - Let's test that idea 🧊 — what if we wrapped an ice cube in a thick blanket?
+          - If blankets made heat, the ice would melt faster. But actually, wrapped ice melts **slower**!
+        follow_up: So what is the blanket really doing to the heat?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — a jacket is a poor conductor of heat. It doesn't make heat — your body does.
+        follow_up: What does the jacket do to the heat from your body?
+    confirm:
+      - That's it! 🧥 The jacket is an **insulator** — it slows down heat leaving your body. Your body is the heat source.
+
+  - id: heat_equals_temperature
+    label: "Heat vs Temperature"
+    nudge: "Two things can have the same temperature but hold different amounts of heat."
+    concept: heat_energy
+    type: VOCABULARY_CONFUSION
+    statement: Heat and temperature are the same thing.
+    corrective_target: Temperature measures how hot something is; heat is energy that flows. A bigger amount of material can hold more heat at the same temperature.
+    patterns:
+      - "heat (is|and) (the same as |same as )?temperature"
+      - "temperature (is|means) (the )?heat"
+      - "more temperature"
+      - "same temperature.{0,30}same (amount of )?heat"
+      - "\\bsame heat\\b"
+    resolution_patterns:
+      - "(more|bigger|larger) (amount|volume|water|mass).{0,40}(more|much) heat"
+      - "heat is (a form of )?energy"
+    teaching:
+      ANALOGY:
+        messages:
+          - Great question to untangle! 🧶 Think about a bathtub and a teacup, both full of 40°C water.
+          - They have the **same temperature**, but the bathtub holds way more **heat energy** — it could melt many more ice cubes!
+        follow_up: So which one has more heat — the bathtub or the teacup?
+      DIRECT_HINT:
+        messages:
+          - Hint 💡 — temperature tells *how hot*. Heat is the *energy* that can flow.
+        follow_up: Can two things have the same temperature but different amounts of heat?
+    confirm:
+      - Perfect! 🛁 Same temperature, but the bigger amount of water holds **more heat energy**.
+
+questions:
+  - id: heat_001
+    answer_praise: "You noticed that the metal spoon and the wooden spoon behave differently."
+    concept: heat_conduction
+    related_concepts: [temperature, heat_flow]
+    difficulty: 2
+    emoji: spoon
+    prompt: A metal spoon and a wooden spoon have been in the same room overnight. Why does the metal spoon feel colder when you touch it?
+    answer_patterns:
+      - "metal"
+    expected_answer: The metal spoon feels colder because metal conducts heat away from your hand faster, even though both spoons are at the same temperature.
+    expected_reasoning:
+      - id: same_temp
+        point: Both spoons are at the same (room) temperature.
+        patterns: ["same temperature", "room temperature", "same temp", "both .{0,20}(are|at) .{0,10}same"]
+      - id: conducts_faster
+        point: Metal conducts heat away from the hand faster than wood.
+        patterns:
+          - "(conduct|conducts|conductor)"
+          - "(take|takes|draw|draws|pull|pulls|remove|removes|transfer|transfers|move|moves|carry|carries).{0,30}heat.{0,30}(faster|quicker|quickly|away|more)"
+          - "heat.{0,30}(away|faster|quicker|quickly)"
+    required_points: [conducts_faster]
+    misconceptions: [metal_is_colder, cold_flows]
+    hints:
+      - Think about what your hand is doing when you touch the spoon.
+      - Do objects in the same room end up at different temperatures?
+    demo_answers:
+      misconception: Because metal is colder than wood. Metal naturally has a lower temperature.
+      dialogue: Maybe the metal takes heat from my hand faster.
+      correct: Both spoons are at room temperature, but metal is a good conductor so it takes heat away from my hand faster.
+    transfer_questions:
+      - id: heat_001_t1
+        prompt: A metal chair and a plastic chair have been kept in the same air-conditioned room. Which one is likely to feel colder when you first touch it, and why?
+        emoji: chair
+        answer_patterns: ["metal"]
+        expected_answer: The metal chair, because metal conducts heat away from your body faster than plastic.
+        expected_reasoning:
+          - id: conducts_faster
+            point: Metal conducts heat away from the body faster than plastic.
+            patterns:
+              - "(conduct|conducts|conductor)"
+              - "(take|takes|draw|draws|pull|pulls|remove|removes|transfer|transfers|move|moves|carry|carries).{0,30}heat.{0,30}(faster|quicker|quickly|away|more)"
+              - "heat.{0,30}(away|faster|quicker|quickly)"
+        required_points: [conducts_faster]
+        demo_answer: The metal chair, because it transfers heat away from my body faster.
+      - id: heat_001_t2
+        prompt: Two cups contain cold water — one cup is metal and the other is plastic. Which cup will take heat from your hand faster, and why?
+        emoji: cup
+        answer_patterns: ["metal"]
+        expected_answer: The metal cup, because metal is a better conductor of heat than plastic.
+        expected_reasoning:
+          - id: conducts_faster
+            point: Metal is a better conductor of heat than plastic.
+            patterns: ["(conduct|conducts|conductor)", "heat.{0,30}(faster|quicker|quickly|through)"]
+        required_points: [conducts_faster]
+        demo_answer: The metal cup because metal is a better conductor of heat.
+
+  - id: heat_002
+    answer_praise: "You noticed that the ice changes the juice's temperature."
+    concept: heat_flow
+    related_concepts: [heat_energy]
+    difficulty: 2
+    emoji: ice
+    prompt: Mei puts ice cubes into a glass of warm orange juice. After a few minutes the juice is cooler. Explain what happened.
+    answer_patterns: ["heat", "cool", "melt"]
+    expected_answer: Heat flowed from the warmer juice to the colder ice, so the juice lost heat and became cooler while the ice gained heat and melted.
+    expected_reasoning:
+      - id: heat_from_juice
+        point: Heat flows from the warmer juice to the colder ice.
+        patterns: ["heat.{0,40}(from|out of) the (juice|drink)", "(juice|drink).{0,30}(lose|loses|lost|gives|give|gave|transfer|transfers).{0,20}heat", "heat.{0,30}(to|into) the ice"]
+      - id: ice_gains
+        point: The ice gains heat and melts.
+        patterns: ["ice.{0,30}(gain|gains|gained|absorb|absorbs|take|takes|took).{0,20}heat", "ice.{0,20}melt"]
+    required_points: [heat_from_juice]
+    misconceptions: [cold_flows]
+    hints:
+      - Which is hotter at the start — the juice or the ice?
+      - Heat always flows from ... to ...?
+    demo_answers:
+      misconception: The ice gives out cold to the juice so the juice becomes cold.
+      dialogue: The juice loses heat to the ice.
+      correct: Heat flows from the warmer juice into the colder ice, so the juice loses heat and the ice melts.
+    transfer_questions:
+      - id: heat_002_t1
+        prompt: A hot bowl of soup is left on the table. After 30 minutes it is only warm. Where did the soup's heat go?
+        emoji: soup
+        answer_patterns: ["heat", "air", "surround"]
+        expected_answer: The soup lost heat to the cooler surrounding air and table, because heat flows from hotter to colder.
+        expected_reasoning:
+          - id: heat_to_surroundings
+            point: Heat flowed from the hotter soup to the cooler surroundings.
+            patterns: ["(lose|loses|lost|gave|give|gives|transfer|transferred|flow|flowed|flows|went|go).{0,30}(heat)?.{0,30}(to|into) the (air|surrounding|surroundings|table|room)", "heat.{0,30}(air|surrounding|surroundings)"]
+        required_points: [heat_to_surroundings]
+        demo_answer: The soup lost heat to the cooler air around it.
+
+      - id: heat_002_t2
+        prompt: Ravi holds a can of cold drink straight from the cooler box. After a while, his hand feels cold and the drink is less cold. Which way did heat flow?
+        emoji: cup_with_straw
+        answer_patterns: ["heat", "hand"]
+        expected_answer: Heat flowed from Ravi's warmer hand into the colder can, so his hand lost heat and the drink gained heat.
+        expected_reasoning:
+          - id: heat_from_hand
+            point: Heat flowed from the warmer hand into the colder can.
+            patterns:
+              - "heat.{0,40}(from|out of) (his|my|the|ravi's) (warm |warmer )?hand"
+              - "hand.{0,30}(lose|loses|lost|gives|give|gave|transfer|transfers|transferred).{0,20}heat"
+              - "heat.{0,40}(to|into) the (cold |colder )?(can|drink)"
+        required_points: [heat_from_hand]
+        demo_answer: Heat flowed from his warmer hand into the cold can, so his hand lost heat and the drink warmed up a little.
+
+  - id: heat_003
+    answer_praise: "You noticed that the sweater helps Ravi stay warm."
+    concept: insulation
+    related_concepts: [heat_flow]
+    difficulty: 2
+    emoji: coat
+    prompt: On a cold day, Ravi wears a thick woollen sweater and feels warm. Explain how the sweater keeps him warm.
+    answer_patterns: ["sweater", "wool", "heat", "warm"]
+    expected_answer: Wool is a poor conductor of heat and traps air, so it slows down the heat lost from Ravi's body.
+    expected_reasoning:
+      - id: poor_conductor
+        point: Wool is a poor conductor (insulator) of heat.
+        patterns: ["poor conductor", "insulator", "insulat", "trap.{0,15}air"]
+      - id: slows_heat_loss
+        point: It slows down heat loss from the body.
+        patterns: ["(slow|slows|reduce|reduces|less|stop|stops|prevent|prevents|keep|keeps).{0,30}heat.{0,30}(loss|lost|leav|escap|out|from)", "heat.{0,30}(body|him).{0,20}(slow|slower|less)"]
+    required_points: [slows_heat_loss]
+    misconceptions: [jacket_makes_heat]
+    hints:
+      - Where does the heat come from in the first place — the sweater or Ravi?
+    demo_answers:
+      misconception: The sweater makes heat so Ravi feels warm.
+      dialogue: The sweater slows down the heat leaving his body.
+      correct: Wool is a poor conductor of heat, so it slows down heat loss from Ravi's body.
+    transfer_questions:
+      - id: heat_003_t1
+        prompt: Aunty Lim wraps a cold ice-cream tub in newspaper before taking it home. How does the newspaper help the ice cream stay frozen?
+        emoji: ice_cream
+        answer_patterns: ["newspaper", "heat", "insulat", "slow"]
+        expected_answer: Newspaper is a poor conductor of heat, so it slows down heat flowing from the warm air into the ice cream.
+        expected_reasoning:
+          - id: slows_heat_gain
+            point: The newspaper slows heat flowing from the surroundings INTO the ice cream.
+            patterns: ["(slow|slows|reduce|reduces|less|stop|stops|prevent|prevents|keep|keeps).{0,40}heat", "poor conductor", "insulat"]
+        required_points: [slows_heat_gain]
+        demo_answer: Newspaper is a poor conductor so it slows down heat from the warm air getting into the ice cream.
+
+      - id: heat_003_t2
+        prompt: At a hawker centre, the drinks stall keeps its ice in a thick foam box. Why does the ice last longer in the foam box than in an open basin?
+        emoji: ice
+        answer_patterns: ["insulat", "poor conductor", "slow", "foam"]
+        expected_answer: Foam is a poor conductor of heat, so it slows down heat flowing from the warm air into the ice, and the ice melts more slowly.
+        expected_reasoning:
+          - id: slows_heat_gain
+            point: The foam slows heat flowing from the surroundings INTO the ice.
+            patterns: ["(slow|slows|reduce|reduces|less|stop|stops|prevent|prevents|keep|keeps).{0,40}heat", "poor conductor", "insulat"]
+        required_points: [slows_heat_gain]
+        demo_answer: The foam box is a poor conductor of heat, so it slows down heat from the warm air getting into the ice.
+
+  - id: heat_004
+    answer_praise: "You spotted that the amount of water might matter."
+    concept: heat_energy
+    related_concepts: [temperature]
+    difficulty: 3
+    emoji: bathtub
+    prompt: A bathtub of water and a small cup of water are both at 40°C. Which one can melt more ice cubes? Explain.
+    answer_patterns: ["bath", "tub", "bigger", "larger"]
+    expected_answer: The bathtub, because although both are at 40°C, the larger amount of water holds more heat energy.
+    expected_reasoning:
+      - id: same_temp
+        point: Both have the same temperature.
+        patterns: ["same temperature", "both .{0,10}40", "same temp"]
+      - id: more_heat
+        point: The larger amount of water holds more heat energy.
+        patterns: ["(more|bigger|larger|greater).{0,30}(heat|energy)", "(heat|energy).{0,30}(more|bigger|larger)"]
+    required_points: [more_heat]
+    misconceptions: [heat_equals_temperature]
+    hints:
+      - Temperature is the same. What else could be different?
+    demo_answers:
+      misconception: They can melt the same amount because heat is the same as temperature.
+      dialogue: The bathtub has more water so it has more heat.
+      correct: The bathtub, because it has more water so it holds more heat energy even at the same temperature.
+    transfer_questions:
+      - id: heat_004_t1
+        prompt: A big pot and a small pot of soup are both at 80°C. Which one will keep a cold room warmer for longer? Why?
+        emoji: pot
+        answer_patterns: ["big", "large"]
+        expected_answer: The big pot, because it holds more heat energy at the same temperature.
+        expected_reasoning:
+          - id: more_heat
+            point: The big pot holds more heat energy.
+            patterns: ["(more|bigger|larger|greater).{0,30}(heat|energy)"]
+        required_points: [more_heat]
+        demo_answer: The big pot because it has more heat energy.
+
+      - id: heat_004_t2
+        prompt: A swimming pool and a pail of water have both been in the sun and are both at 30°C. Which one has more heat energy? Explain.
+        emoji: water_wave
+        answer_patterns: ["pool"]
+        expected_answer: The swimming pool, because it has much more water at the same temperature, so it holds more heat energy.
+        expected_reasoning:
+          - id: more_heat
+            point: The larger amount of water holds more heat energy.
+            patterns: ["(more|bigger|larger|greater).{0,30}(heat|energy)", "(heat|energy).{0,30}(more|bigger|larger)"]
+        required_points: [more_heat]
+        demo_answer: The swimming pool, because it has much more water, so it has more heat energy even at the same temperature.
+
+  - id: heat_005
+    answer_praise: "You noticed that the gaps have a purpose."
+    concept: expansion
+    related_concepts: [heat_flow]
+    difficulty: 2
+    emoji: train
+    prompt: Why are small gaps left between sections of railway tracks?
+    answer_patterns: ["expand", "bigger", "gap"]
+    expected_answer: On hot days the metal tracks gain heat and expand; the gaps give them room to expand without bending.
+    expected_reasoning:
+      - id: gain_heat_expand
+        point: The metal gains heat and expands.
+        patterns: ["expand", "get bigger", "gets longer", "becomes? (bigger|longer)"]
+      - id: room_to_expand
+        point: The gaps give room so the tracks don't bend or buckle.
+        patterns: ["(room|space).{0,20}(expand|grow)", "(bend|buckle|crack|break)"]
+    required_points: [gain_heat_expand]
+    misconceptions: []
+    hints:
+      - What happens to metal on a very hot day?
+    demo_answers:
+      misconception: So that water can drain away.
+      dialogue: The tracks expand when they get hot.
+      correct: When the tracks gain heat on a hot day they expand, so the gaps give them room and they won't bend.
+    transfer_questions:
+      - id: heat_005_t1
+        prompt: A tight metal lid on a glass jar is hard to open. Dad runs hot water over the lid and it opens easily. Explain why.
+        emoji: jar
+        answer_patterns: ["expand", "bigger", "loos"]
+        expected_answer: The metal lid gains heat from the hot water and expands, so it becomes looser.
+        expected_reasoning:
+          - id: lid_expands
+            point: The metal lid gains heat and expands.
+            patterns: ["expand", "(bigger|looser|larger)"]
+        required_points: [lid_expands]
+        demo_answer: The hot water makes the metal lid expand so it gets looser.
+
+      - id: heat_005_t2
+        prompt: Mei puts a thermometer into a cup of hot water. The red liquid inside the thermometer rises up the tube. Explain why.
+        emoji: thermometer
+        answer_patterns: ["expand", "bigger", "more space"]
+        expected_answer: The liquid in the thermometer gains heat from the hot water and expands, so it takes up more space and rises up the tube.
+        expected_reasoning:
+          - id: liquid_expands
+            point: The liquid gains heat and expands.
+            patterns: ["expand", "(more space|bigger|larger volume)"]
+        required_points: [liquid_expands]
+        demo_answer: The liquid gains heat from the hot water and expands, so it rises up the tube.
+
+  - id: heat_006
+    answer_praise: "You noticed that her hands can't be trusted here."
+    concept: temperature
+    related_concepts: []
+    difficulty: 1
+    emoji: thermometer
+    prompt: Siti dips one hand in cold water and the other in warm water. Then she puts both hands in room-temperature water. Why do her hands feel different, and how could she find the real temperature?
+    answer_patterns: ["thermometer", "different", "feel"]
+    expected_answer: Our hands feel changes in heat, not the actual temperature, so touch is unreliable. She should use a thermometer.
+    expected_reasoning:
+      - id: touch_unreliable
+        point: Touch is not a reliable way to judge temperature.
+        patterns: ["(not|isn't|cannot|can't).{0,20}(reliable|accurate|trust)", "(hand|hands|skin).{0,40}(different|was|were|before)"]
+      - id: use_thermometer
+        point: A thermometer measures temperature accurately.
+        patterns: ["thermometer"]
+    required_points: [use_thermometer]
+    misconceptions: []
+    hints:
+      - What tool do scientists use to measure temperature?
+    demo_answers:
+      misconception: The water is different temperatures in different places.
+      dialogue: She should use a thermometer.
+      correct: Her hands were at different temperatures before so touch is not reliable. She should use a thermometer.
+    transfer_questions:
+      - id: heat_006_t1
+        prompt: After coming in from the hot sun, the classroom feels cold to Ben but normal to his friend who stayed inside. How can they find out who is right?
+        emoji: thermometer
+        answer_patterns: ["thermometer"]
+        expected_answer: Use a thermometer, because feelings of hot and cold depend on what your body was touching before.
+        expected_reasoning:
+          - id: use_thermometer
+            point: Use a thermometer to measure temperature.
+            patterns: ["thermometer"]
+        required_points: [use_thermometer]
+        demo_answer: They should use a thermometer because feeling is not reliable.
+
+      - id: heat_006_t2
+        prompt: Ahmad comes out of a cold swimming pool and says the shower water is hot. His sister, who just came from the warm changing room, says it is only warm. How can they find out who is right?
+        emoji: thermometer
+        answer_patterns: ["thermometer"]
+        expected_answer: Measure the water with a thermometer, because how hot or cold something feels depends on what your skin touched before, so touch is not reliable.
+        expected_reasoning:
+          - id: use_thermometer
+            point: Use a thermometer to measure temperature.
+            patterns: ["thermometer"]
+        required_points: [use_thermometer]
+        demo_answer: They should measure the water with a thermometer, because touch is not reliable.
+
+  - id: heat_007
+    answer_praise: "You picked the ice cube that melts first."
+    concept: insulation
+    related_concepts: [heat_flow]
+    difficulty: 3
+    emoji: ice
+    prompt: 'Ali wraps one ice cube in a woollen cloth and leaves another ice cube unwrapped on the table. His friend says, "The wrapped one will melt first, because wool is warm." Which ice cube melts first? Explain.'
+    answer_patterns: ["unwrapped", "not wrapped", "without (the )?(cloth|wool)", "uncovered"]
+    expected_answer: The unwrapped ice cube melts first. Wool is a poor conductor of heat, so it slows down the heat flowing from the warm air into the wrapped ice cube. The wool does not make heat.
+    expected_reasoning:
+      - id: poor_conductor
+        point: Wool is a poor conductor of heat (an insulator).
+        patterns: ["poor conductor", "insulat", "trap.{0,15}air"]
+      - id: slows_heat_gain
+        point: The wool slows heat flowing from the warm air into the wrapped ice cube.
+        patterns:
+          - "(slow|slows|slowing|reduce|reduces|less|stop|stops|prevent|prevents|keep|keeps).{0,40}heat"
+          - "heat.{0,40}(slower|more slowly)"
+    required_points: [slows_heat_gain]
+    misconceptions: [jacket_makes_heat]
+    hints:
+      - Does wool make heat, or does it only slow heat down?
+      - Where does the heat that melts the ice come from?
+    demo_answers:
+      misconception: The wrapped ice cube melts first because the wool cloth makes heat and warms it up.
+      dialogue: The wool slows down heat from the warm air getting into the ice.
+      correct: The unwrapped ice cube melts first. Wool is a poor conductor of heat, so it slows down heat flowing from the warm air into the wrapped ice cube.
+    transfer_questions:
+      - id: heat_007_t1
+        prompt: Mum carries a cold watermelon home from the supermarket in a cooler bag lined with foam. Why does the watermelon stay cold for longer?
+        emoji: shopping_cart
+        answer_patterns: ["foam", "insulat", "poor conductor", "slow"]
+        expected_answer: The foam is a poor conductor of heat, so it slows down heat flowing from the warm air into the watermelon.
+        expected_reasoning:
+          - id: slows_heat_gain
+            point: The foam slows heat flowing from the warm air INTO the watermelon.
+            patterns: ["(slow|slows|reduce|reduces|less|stop|stops|prevent|prevents|keep|keeps).{0,40}heat", "poor conductor", "insulat"]
+        required_points: [slows_heat_gain]
+        demo_answer: The foam is a poor conductor of heat, so it slows down heat from the warm air getting into the watermelon.
+      - id: heat_007_t2
+        prompt: Ravi keeps his hot packet of chicken rice in an insulated lunch bag. Could the same bag also keep a cold drink cold? Explain.
+        emoji: cup_with_straw
+        answer_patterns: ["yes", "both", "can also", "could also"]
+        expected_answer: Yes. The bag is an insulator, so it slows down heat flow in both directions — heat leaving the hot food, and heat from the warm air entering the cold drink.
+        expected_reasoning:
+          - id: both_directions
+            point: An insulator slows heat flow in both directions — in and out.
+            patterns:
+              - "both (ways|directions)"
+              - "(in|into).{0,30}(and|or) out"
+              - "(out|leav).{0,30}(and|or) (in|into|enter)"
+              - "(slow|slows|reduce|reduces|stop|stops).{0,30}heat.{0,40}(into|getting in|enter|entering|going in)"
+        required_points: [both_directions]
+        demo_answer: Yes. The bag is an insulator, so it slows down heat flow both ways, and heat from the warm air cannot get into the cold drink quickly.
+
+  - id: heat_008
+    answer_praise: "You noticed that both the milk and the water change temperature."
+    concept: heat_flow
+    related_concepts: [temperature, heat_energy]
+    difficulty: 3
+    emoji: glass_of_milk
+    prompt: A bottle of milk is too hot for baby Aisha. Mum stands the bottle in a basin of cool tap water. Explain what happens to the milk and the water. When does this stop?
+    answer_patterns: ["heat", "same temperature"]
+    expected_answer: Heat flows from the hotter milk into the cooler water, so the milk loses heat and cools down while the water gains heat and warms up. This stops when the milk and the water reach the same temperature.
+    expected_reasoning:
+      - id: heat_from_milk
+        point: Heat flows from the hotter milk to the cooler water.
+        patterns:
+          - "heat.{0,40}(from|out of) the (hot |hotter |warm |warmer )?(milk|bottle)"
+          - "(milk|bottle).{0,30}(lose|loses|lost|gives|give|gave|transfer|transfers).{0,20}heat"
+          - "heat.{0,40}(to|into) the (cool |cooler |cold |colder )?(water|basin)"
+      - id: same_temp_stop
+        point: Heat flow stops when the milk and the water reach the same temperature.
+        patterns: ["same temperature", "same temp", "(until|till|when).{0,40}(equal|same)"]
+    required_points: [heat_from_milk, same_temp_stop]
+    misconceptions: [cold_flows]
+    hints:
+      - Which is hotter at the start — the milk or the water?
+      - Will the milk keep cooling forever, or does it stop at some point?
+    demo_answers:
+      misconception: The cool water gives cold to the milk until the milk becomes cold.
+      dialogue: The milk loses heat to the water until they are the same temperature.
+      correct: Heat flows from the hotter milk into the cooler water, so the milk loses heat and the water gains heat. This stops when both reach the same temperature.
+    transfer_questions:
+      - id: heat_008_t1
+        prompt: Siti puts a metal spoon into a bowl of hot soup. After a few minutes, the spoon is hot too. Where did the spoon's heat come from, and when does it stop getting hotter?
+        emoji: spoon
+        answer_patterns: ["heat", "soup"]
+        expected_answer: Heat flowed from the hotter soup into the cooler spoon. The spoon stops getting hotter when it reaches the same temperature as the soup.
+        expected_reasoning:
+          - id: heat_from_soup
+            point: Heat flowed from the hotter soup into the spoon.
+            patterns:
+              - "heat.{0,40}(from|out of) the (hot |hotter )?soup"
+              - "soup.{0,30}(lose|loses|lost|gives|give|gave|transfer|transfers|transferred).{0,20}heat"
+              - "heat.{0,40}(to|into) the (cool |cooler |cold |colder |metal )?spoon"
+          - id: same_temp_stop
+            point: Heat flow stops when the spoon and the soup reach the same temperature.
+            patterns: ["same temperature", "same temp", "(until|till|when).{0,40}(equal|same)"]
+        required_points: [heat_from_soup, same_temp_stop]
+        demo_answer: Heat flowed from the hotter soup into the cooler spoon. It stops getting hotter when the spoon and the soup reach the same temperature.
+      - id: heat_008_t2
+        prompt: Ahmad leaves a cold drink on the kitchen table. Two hours later, the drink is at room temperature. Explain what happened, using the idea of heat flow.
+        emoji: cup_with_straw
+        answer_patterns: ["heat", "gain", "warm"]
+        expected_answer: Heat flowed from the warmer surrounding air into the colder drink, so the drink gained heat until it reached the same temperature as the room.
+        expected_reasoning:
+          - id: heat_into_drink
+            point: Heat flowed from the warmer air into the colder drink.
+            patterns:
+              - "heat.{0,40}(to|into) the (cold |colder )?(can|drink)"
+              - "(drink|can).{0,30}(gain|gains|gained|absorb|absorbs|absorbed|take in|takes in|took in).{0,20}heat"
+              - "heat.{0,40}(from|out of) the (warm |warmer )?(air|room|surround)"
+          - id: same_temp_stop
+            point: Heat flow stops when the drink reaches the same temperature as the room.
+            patterns: ["same temperature", "same temp", "room temperature", "(until|till|when).{0,40}(equal|same)"]
+        required_points: [heat_into_drink]
+        demo_answer: Heat flowed from the warmer air into the cold drink, so the drink gained heat until it reached the same temperature as the room.

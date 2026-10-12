@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 36 100% 97%;
+    --foreground: 246 37% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 246 37% 17%;
+    --primary: 253 100% 68%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 250 20% 96%;
+    --muted-foreground: 246 12% 47%;
+    --border: 250 22% 91%;
+    --input: 250 22% 88%;
+    --ring: 253 100% 68%;
+    --radius: 1.25rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-cream text-ink-900;
+    font-feature-settings: "ss01";
+  }
+  ::selection {
+    background: #d6cbff;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply tracking-tight;
+  }
+}
+
+@layer components {
+  /* Soft dotted paper texture used behind the app */
+  .paper-bg {
+    background-color: #fff9f1;
+    background-image: radial-gradient(rgba(124, 92, 255, 0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .blob-bg {
+    background:
+      radial-gradient(40rem 22rem at 10% -10%, rgba(124, 92, 255, 0.16), transparent 60%),
+      radial-gradient(30rem 20rem at 95% 0%, rgba(255, 197, 61, 0.18), transparent 60%),
+      radial-gradient(34rem 24rem at 60% 110%, rgba(31, 185, 120, 0.12), transparent 60%);
+  }
+  .card-base {
+    @apply rounded-3xl border border-ink-200/80 bg-white shadow-soft;
+  }
+  .label-caps {
+    @apply text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink-400;
+  }
+  .scroll-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: #e6e4ef;
+    border-radius: 999px;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .shimmer-text {
+    background: linear-gradient(90deg, #7c5cff 0%, #b8a6ff 40%, #7c5cff 80%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    @apply animate-shimmer;
+  }
+}
+
+/* React Flow: soften defaults to match the Curio look */
+.react-flow__attribution {
+  display: none;
+}
+.react-flow__edge-path {
+  stroke-linecap: round;
+}
+.react-flow__handle {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
