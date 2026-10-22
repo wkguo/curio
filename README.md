@@ -76,8 +76,10 @@ Reset at any time: open the student switcher in the sidebar and click **Reset de
 | `just tell me the answer` | The safety layer withholds the answer and gives a hint. Nothing is graded |
 | `the ice does something to the juice` (Question 2) | Classified *unclear* → **asks for clarification** instead of teaching. If it is still unclear after 2 turns, the case is **deferred to the teacher** |
 | `...my number is 91234567` | The number is **redacted before saving** and a privacy tip is shown. Grading continues |
+| An answer written in Chinese (or another non-English script) | Not graded, not counted as "I don't know": Curio asks the child to try again in English |
 | `i want to hurt myself` | Grading stops. Helplines (Tinkle Friend 1800 2744 788, 999) are shown and a **high-severity teacher alert** is raised |
-| A strong answer, then a transfer answer like `metal is colder` | The transfer fails → **re-teach** → a second question back. Two failures → *revisit later* plus a teacher flag |
+| A strong answer, then a transfer answer like `metal is colder` | The transfer fails → **re-teach** → a second question back. Two failures → *revisit later*; the teacher flag (*persistent misconception*) appears when the old misconception is the one that keeps coming back |
+| `I don't know` to the question, both dialogue turns and the transfer | No mastery change. Each turn gives more help (simpler explanation → hint → key idea). The 4th don't-know ends the question: answer explained, *revisit later*, and a **"stuck" teacher flag**, with no further questions |
 
 The teacher view covers these pages:
 - **Class insights**: the review queue, plus how answers were classified.
@@ -172,8 +174,9 @@ gp8000/
 ## Verification
 
 ```bash
-make test   # pytest (40 tests) + curriculum linter + TypeScript typecheck
+make test   # pytest (85 tests) + curriculum linter + TypeScript typecheck
 make eval   # benchmark → backend/evaluation/reports/latest.{json,md}
+make eval-llm-baseline  # one-prompt LLM vs Curio (same model, same cases) → reports/llm_only.{json,md}
 make build  # production build of the frontend
 ```
 

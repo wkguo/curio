@@ -173,3 +173,34 @@ def test_pii_in_reply_shows_privacy_tip(fresh_demo):
         "/api/learning/reply", json={"student_id": SID, "interaction_id": r["interaction_id"], "message": "metal takes heat away faster, call 91234567"}
     ).json()
     assert rep["safety"]["category"] == "pii" and rep["resolved"]
+
+
+# ----------------------------------------------------------------- repeated "I don't know"
+def _reply(c, iid, msg):
+    return c.post("/api/learning/reply", json={"student_id": SID, "interaction_id": iid, "message": msg}).json()
+
+
+def _transfer(c, iid, answer):
+    return c.post("/api/learning/transfer", json={"student_id": SID, "interaction_id": iid, "answer": answer}).json()
+
+
+def test_repeated_dont_know_is_bounded_and_flags_teacher(fresh_demo):
+    c = fresh_demo
+    r = submit(c, "heat_001", "I don't know")
+    assert r["verification"]["classification"] == "guess" and r["mastery_after"] == r["mastery_before"]
+    iid = r["interaction_id"]
+    rep1 = _reply(c, iid, "idk")
+    assert "Getting closer" not in " ".join(rep1["teaching_response"]["messages"])
+    rep2 = _reply(c, iid, "dunno")
+    assert rep2["ready_for_transfer"] and "key idea" in " ".join(rep2["teaching_response"]["messages"])
+    t = _transfer(c, iid, "i dont know")
+    assert t["next_state"] == "revisit" and t["attempt"] == 1 and t["next_transfer_question"] is None
+    assert t["mastery_after"] == t["mastery_before"] and "teacher" in t["feedback"]
+    assert any(q["kind"] == "stuck" and q["student_id"] == SID for q in c.get("/api/teacher/queue").json())
+
+
+def test_one_dont_know_after_real_engagement_still_gets_a_second_question(fresh_demo):
+    c = fresh_demo
+    r = submit(c, "heat_001", "Both spoons are at room temperature but metal conducts heat away from my hand faster")
+    t = _transfer(c, r["interaction_id"], "idk")
+    assert t["next_state"] == "reteach" and t["next_transfer_question"]

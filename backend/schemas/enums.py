@@ -62,6 +62,7 @@ class SafetyCategory(str, Enum):
     PROMPT_INJECTION = "prompt_injection"
     OFF_TOPIC = "off_topic"
     ANSWER_REQUEST = "answer_request"
+    LANGUAGE = "language"
 
 
 # Response classification (proposal module 3: correct / incomplete / misconception-linked, plus

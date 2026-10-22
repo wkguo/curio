@@ -1,15 +1,15 @@
 # Curio — common commands. Requires: uv (Python 3.11+), Node 20+ / npm.
-.PHONY: setup dev backend frontend test check seed fixtures build eval video video-short
+.PHONY: setup dev backend frontend test check seed fixtures build eval eval-llm-baseline video video-short
 
 setup:            ## install backend + frontend dependencies
 	cd backend && uv sync --group dev
 	cd frontend && npm install
 
-dev:              ## run backend (:8000) and frontend (:3000) together
+dev:              ## run backend (:8000, or CURIO_API_PORT) and frontend (:3000) together
 	./scripts/dev.sh
 
 backend:          ## FastAPI with reload
-	cd backend && uv run uvicorn main:app --reload --port 8000
+	cd backend && uv run uvicorn main:app --reload --port $${CURIO_API_PORT:-8000}
 
 frontend:         ## Next.js dev server
 	cd frontend && npm run dev
@@ -26,6 +26,9 @@ seed:             ## rebuild the demo database (Alex + class of 24)
 
 eval:             ## run the gold-labelled benchmark → backend/evaluation/reports/latest.{json,md}
 	cd backend && uv run python -m evaluation.run
+
+eval-llm-baseline: ## "why not just prompt an LLM?": one-prompt LLM vs Curio → reports/llm_only.{json,md} (needs CURIO_LLM_* in backend/.env)
+	cd backend && uv run python -m evaluation.llm_only --with-curio-llm
 
 fixtures:         ## regenerate offline-demo fixtures from the real backend
 	cd backend && uv run python scripts/export_fixtures.py

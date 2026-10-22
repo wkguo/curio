@@ -400,7 +400,7 @@ class TraceDetail(TraceSummary):
 # ----------------------------------------------------------------- teacher review & content
 class ReviewItem(BaseModel):
     id: str
-    kind: str  # safety | deferred | persistent_misconception
+    kind: str  # safety | deferred | persistent_misconception | stuck
     category: str
     severity: str
     student_id: str

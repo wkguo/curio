@@ -13,6 +13,8 @@ from api import analytics, curriculum, demo, evaluation, learning, privacy, stud
 from config import get_settings
 from curriculum.loader import get_curriculum
 from database.seed import seed
+from database.session import SessionLocal
+from services import privacy as privacy_svc
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -21,6 +23,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 async def lifespan(app: FastAPI):
     get_curriculum()  # fail fast on an invalid curriculum pack
     seed(force=False)
+    with SessionLocal() as db:  # data minimisation: records past the retention period go at every start
+        privacy_svc.purge_expired(db)
     yield
 
 

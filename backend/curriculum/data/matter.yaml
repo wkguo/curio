@@ -455,7 +455,7 @@ questions:
     difficulty: 2
     emoji: hot_beverage
     prompt: Mei stirs a spoonful of sugar into her hot kopi. After a while, she cannot see the sugar anymore. Her brother says the sugar melted. Is he right? Explain.
-    answer_patterns: ["dissolv", "no", "not"]
+    answer_patterns: ["dissolv", "\\bno\\b", "\\bnot\\b"]
     answer_praise: "You noticed that the sugar seems to disappear in the kopi."
     expected_answer: No. The sugar dissolved — it spread out in the kopi and is still there, which is why the kopi tastes sweet. Melting needs heat to turn a solid into a liquid on its own.
     expected_reasoning:

@@ -32,7 +32,7 @@ from harness.context import GradingKey, StudentSnapshot
 from harness.orchestrator import BlockedResult, PedagogicalHarness
 from harness.problem_parser import parse_problem
 from harness.text import matches
-from services.llm import DisabledLLMClient, get_llm
+from services.llm import DisabledLLMClient, LLMClient, get_llm
 
 HERE = Path(__file__).resolve().parent
 BENCHMARK = HERE / "benchmark.yaml"
@@ -67,6 +67,9 @@ async def _predict(harness: PedagogicalHarness, case: dict) -> dict:
             "answer_correct": None,
             "strategy": None,
             "baseline_credit": False,
+            "first_reply": res.safety.student_message,
+            "llm_steps": 0,
+            "fallback_steps": 0,
         }
     v, d = res.verification, res.diagnosis
     return {
@@ -77,13 +80,16 @@ async def _predict(harness: PedagogicalHarness, case: dict) -> dict:
         "strategy": res.strategy.strategy.value,
         "mastery_after": res.mastery.after if res.mastery else None,
         "baseline_credit": baseline_credit,
+        "first_reply": " ".join([*res.teaching.messages, res.teaching.follow_up or ""]),
+        "llm_steps": sum(s.mode == "llm" for s in res.trace.steps),
+        "fallback_steps": sum(s.mode == "fallback" for s in res.trace.steps),
     }
 
 
-async def evaluate(mode: str = "rules", path: Path = BENCHMARK) -> dict:
+async def evaluate(mode: str = "rules", path: Path = BENCHMARK, llm: LLMClient | None = None, cases: list[dict] | None = None) -> dict:
     bench = yaml.safe_load(path.read_text(encoding="utf-8"))
-    cases = bench["cases"]
-    llm = DisabledLLMClient() if mode == "rules" else get_llm()
+    cases = bench["cases"] if cases is None else cases
+    llm = llm or (DisabledLLMClient() if mode == "rules" else get_llm())
     harness = PedagogicalHarness(get_curriculum(), llm)
 
     rows = []

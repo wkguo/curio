@@ -14,33 +14,40 @@ unsafe content or out-of-syllabus vocabulary is replaced by curated content.
 
 import re
 
+from harness.text import has_non_english_script, negated, normalize, word_count
 from schemas.enums import SafetyCategory as C
 from schemas.harness import SafetyReport
 
 _PII = [
     ("email", re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")),
     ("nric", re.compile(r"\b[STFGM]\d{7}[A-Z]\b", re.IGNORECASE)),
-    ("phone", re.compile(r"(?:\+65[\s-]?)?\b[689]\d{3}[\s-]?\d{4}\b")),
+    ("phone", re.compile(r"(?<!\d)(?:\+?65[\s-]?)?[689]\d{3}[\s-]?\d{4}(?!\d)")),
     ("postal_code", re.compile(r"\b(?:singapore|s)\s*\(?\d{6}\)?", re.IGNORECASE)),
     ("address", re.compile(r"\b(?:i live (?:at|in)|my address is)\s+[\w#\-/ ]{0,40}\d+[\w#\-/]*", re.IGNORECASE)),
     ("address", re.compile(r"\b(?:blk|block)\s*\d+[a-z]?\b", re.IGNORECASE)),
 ]
 
 _UNSAFE = re.compile(
-    r"\b(kill (?:my ?self|me|him|her|them)|(?:want|wanna|wish i could) (?:to )?(?:die|disappear|not exist)|"
-    r"hurt (?:my ?self|me|my \w+|him|her|them|someone|somebody)|hate myself|nobody (?:likes|loves|cares about) me|"
+    r"\b(kill (?:my ?self)|(?:want|wanna|going|gonna)(?: to)? (?:to )?kill (?:me|him|her|them|someone|somebody)|"
+    r"how (?:do|can|should|to) (?:i |we )?(?:hurt|kill|harm) |"
+    r"(?:want|wanna|wish i could) (?:to )?(?:die|disappear|not exist)|"
+    r"hurt(?:ing)? my ?self|(?:want|wanna|going|gonna|will)(?: to)? (?:to )?hurt (?:me|my \w+|him|her|them|someone|somebody)|hate myself|"
+    r"nobody (?:likes|loves|cares about) me|"
     r"suicide|cut myself|someone (?:is )?(?:hurting|hitting|touching) me|being bullied|abus(?:e|ing) me)\b",
     re.IGNORECASE,
 )
 _INJECTION = re.compile(
     r"(ignore (?:all |your |the )?(?:previous |above |prior )?(?:instructions|rules|prompt)|"
-    r"system prompt|you are now|pretend (?:to be|you are)|act as (?:a|an|my)|developer mode|jailbreak|"
+    r"system prompt|you are now|pretend (?:to be|you are)|"
+    r"act as (?:a |an |my )?(?:teacher|tutor|ai|assistant|grader|marker|admin|friend|bot|robot|human|person|chatbot|dan|calculator|translator|therapist|doctor|lawyer)\b|"
+    r"developer mode|jailbreak|"
     r"reveal (?:your|the) (?:prompt|instructions))",
     re.IGNORECASE,
 )
 _ANSWER_REQUEST = re.compile(
     r"\b(?:tell|give|show|send) me the (?:correct |right |real )?(?:answer|ans)\b|"
-    r"\bwhat(?:'?s| is) the (?:correct |right )?(?:answer|ans)\b|\bjust give (?:me )?(?:the )?(?:answer|ans)\b",
+    r"\bwhat(?:'?s| is) the (?:correct |right )?(?:answer|ans)\b|\bwhat the (?:correct |right )?(?:answer|ans) is\b|\bjust give (?:me )?(?:the )?(?:answer|ans)\b|"
+    r"\b(?:tell|give|show|send|say|spill|reveal|write)\b.{0,20}\b(?:answers?|ans|solution)\b(?! is\b)|\bhelp me (?:to )?answer\b|\bwhich (?:one )?is (?:the )?(?:correct|right)\b",
     re.IGNORECASE,
 )
 _OFF_TOPIC = re.compile(
@@ -67,9 +74,24 @@ def redact(text: str) -> tuple[str, list[str]]:
     return text, kinds
 
 
+def find_pii(text: str) -> list[str]:
+    """The raw personal-data substrings that `redact` hides (used to audit model inputs)."""
+    return [m.group(0) for _, rx in _PII for m in rx.finditer(text)]
+
+
 def screen_input(text: str, hint: str | None = None) -> SafetyReport:
     clean, kinds = redact(text)
-    if _UNSAFE.search(text):
+    if has_non_english_script(text) and word_count(text) < 4:
+        return SafetyReport(
+            category=C.LANGUAGE,
+            allow_grading=False,
+            redacted_text=clean,
+            redactions=kinds,
+            severity="low",
+            student_message="I can only check answers written in English for now. Could you try again in English? 🌏 Short sentences are fine.",
+        )
+    norm = normalize(text)
+    if any(not negated(norm, m.start()) for m in _UNSAFE.finditer(norm)):  # "i do not want to hurt my sister" is not a risk
         return SafetyReport(
             category=C.UNSAFE, allow_grading=False, redacted_text=clean, redactions=kinds, notify_teacher=True, severity="high", student_message=HELPLINE
         )
@@ -88,7 +110,7 @@ def screen_input(text: str, hint: str | None = None) -> SafetyReport:
         if hint:
             msg += f" Here's a hint: {hint}"
         return SafetyReport(category=C.ANSWER_REQUEST, allow_grading=False, redacted_text=clean, redactions=kinds, severity="low", student_message=msg)
-    if _OFF_TOPIC.search(text):
+    if _OFF_TOPIC.search(text) and word_count(text) <= 12:  # chatter is short; a long answer that mentions "youtube" is still graded
         return SafetyReport(
             category=C.OFF_TOPIC,
             allow_grading=False,

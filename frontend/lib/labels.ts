@@ -54,6 +54,7 @@ export const SAFETY_LABEL: Record<string, string> = {
   prompt_injection: "Prompt injection",
   off_topic: "Off-topic",
   answer_request: "Answer request",
+  language: "Not English",
 };
 
 export const MISCONCEPTION_TYPE: Record<MisconceptionType, string> = {

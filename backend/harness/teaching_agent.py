@@ -8,6 +8,7 @@ Content priority (safety first for a children's product):
 
 from harness.context import GradingKey, StudentSnapshot
 from schemas.curriculum import Topic
+from schemas.enums import MisconceptionType as M
 from schemas.enums import TeachingStrategy as S
 from schemas.harness import (
     AnalysisFeedback,
@@ -54,7 +55,7 @@ def build_feedback(
         missing = [key.point_text[p] for p in key.required_points if p not in v.reasoning_points_hit]
         if missing:
             concerns.append(FeedbackConcern(claim="A step is missing from your explanation", note=key.hints[0] if key.hints else "Can you explain *why*?"))
-        nudge = "Good start! A scientist would add one more step."
+        nudge = "Good start! A scientist would add one more step." if v.reasoning_points_hit else "Let's check the reason together: a scientist always explains *why*."
         if parsed is not None and not parsed.has_explanation:
             nudge = "You gave an answer — now tell me *why*. A “because …” makes it a scientist's answer."
 
@@ -63,8 +64,10 @@ def build_feedback(
         nudge = "Your answer AND your reasoning are both spot on. Let's see if you can use it somewhere new!"
     elif d.misconception_id:
         headline, tone = "One idea needs another look", "investigate"
-    elif v.answer_correct:
+    elif v.answer_correct and v.reasoning_points_hit:
         headline, tone = "Nice! Let's make your explanation complete", "encourage"
+    elif v.answer_correct:
+        headline, tone = "Let's check your reason together", "investigate"
     else:
         headline, tone = "Let's investigate together", "investigate"
     if parsed is not None and parsed.uncertain and d.has_gap:
@@ -126,7 +129,10 @@ def _template_response(decision: StrategyDecision, d: Diagnosis, key: GradingKey
             key_idea=concept.summary if concept else "",
         )
     if st in (S.SOCRATIC_QUESTION, S.DIRECT_HINT) and not d.misconception_id:
-        msgs = ["Hmm, not quite yet — let's look again. 🔍"] if d.classification == "incorrect" else ["Good start! ✅ You're on the right track."]
+        if d.classification == "incorrect" or d.type == M.MISSING_STEP:
+            msgs = ["Hmm, let's check the reason together. 🔍"]
+        else:
+            msgs = ["Good start! ✅ You're on the right track."]
         if st == S.DIRECT_HINT and missing:
             msgs.append(f"Here's a hint 💡 — think about this: {missing[0][0].lower()}{missing[0][1:]}")
         else:

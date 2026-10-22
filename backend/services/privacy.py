@@ -61,7 +61,7 @@ def delete_learning_data(db: Session, student_id: str) -> dict[str, int]:
 def purge_expired(db: Session) -> dict[str, int]:
     cutoff = datetime.now(timezone.utc) - timedelta(days=get_settings().retention_days)
     out = {}
-    for name, model in [("traces", AgentTrace), ("responses", StudentResponse), ("mastery_events", MasteryEvent)]:
+    for name, model in [("traces", AgentTrace), ("responses", StudentResponse), ("mastery_events", MasteryEvent), ("review_items", ReviewQueueItem)]:
         out[name] = db.execute(delete(model).where(model.created_at < cutoff)).rowcount or 0
     db.commit()
     return out

@@ -72,6 +72,31 @@ async def test_llm_outage_falls_back_to_rules_without_error():
     assert any(s.status == "fallback" for s in res.trace.steps)
 
 
+class RecordingLLM(ScriptedLLM):
+    def __init__(self):
+        super().__init__()
+        self.sent: list[str] = []
+
+    async def generate(self, messages, schema=None):
+        self.sent.extend(m["content"] for m in messages)
+        return await super().generate(messages, schema)
+
+
+@pytest.mark.asyncio
+async def test_model_never_sees_student_identity_or_raw_personal_data():
+    cur = get_curriculum()
+    topic, q = cur.question("heat_001")
+    llm = RecordingLLM()
+    snap = StudentSnapshot(student_id="stu_7f3a", display_name="Xiaoming", mastery={"heat_conduction": 0.5, "heat_flow": 0.8})
+    h = PedagogicalHarness(cur, llm)
+    res = await h.run(topic, q, "Metal is colder than wood. call me 91234567 or xm.tan@gmail.com", snap)
+    await h.run_transfer(topic, q, res.transfer, "the steel table, metal takes heat away faster. my ic is T1234567J", snap, None)
+    sent = "\n".join(llm.sent)
+    assert "[hidden]" in sent, "the model saw the answer, but only after redaction"
+    for secret in ("stu_7f3a", "Xiaoming", "91234567", "xm.tan@gmail.com", "T1234567J"):
+        assert secret not in sent
+
+
 def test_extract_json_tolerates_fences_and_prose():
     assert extract_json('```json\n{"a": 1}\n```') == {"a": 1}
     assert extract_json('Sure! {"a": 2} hope that helps') == {"a": 2}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, HeartHandshake, HelpCircle, RotateCcw } from "lucide-react";
+import { Check, HeartHandshake, HelpCircle, LifeBuoy, RotateCcw } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ const KIND: Record<ReviewItem["kind"], { label: string; icon: typeof Check; tone
   safety: { label: "Safety flag", icon: HeartHandshake, tone: "bg-coral-50 text-coral-700" },
   deferred: { label: "Deferred — AI unsure", icon: HelpCircle, tone: "bg-sky-50 text-sky-700" },
   persistent_misconception: { label: "Persistent misconception", icon: RotateCcw, tone: "bg-sun-50 text-sun-700" },
+  stuck: { label: "Stuck — kept saying “I don't know”", icon: LifeBuoy, tone: "bg-sky-50 text-sky-700" },
 };
 
 /** Cases the AI deliberately does not handle alone (proposal: defer to teacher review). */

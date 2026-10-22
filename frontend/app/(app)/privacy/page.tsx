@@ -67,7 +67,7 @@ export default function PrivacyPage() {
 
       <Card className="mt-5 p-6">
         <h2 className="mb-1 text-lg font-black text-ink-900">Stored for this student right now</h2>
-        <p className="mb-4 text-sm font-semibold text-ink-500">Learning records are deleted automatically after {data?.retention_days ?? 365} days.</p>
+        <p className="mb-4 text-sm font-semibold text-ink-500">Records older than {data?.retention_days ?? 365} days are removed each time the server starts.</p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           {data &&
             Object.entries(data.stored).map(([k, v]) => (

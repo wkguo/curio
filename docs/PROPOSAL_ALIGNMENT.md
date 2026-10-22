@@ -49,6 +49,7 @@ Source: [`docs/source/GP8001_Curio_Proposal_B3.docx`](source/GP8001_Curio_Propos
   - decision consistency;
   - **an answer-only baseline** (what an auto-marked quiz does), measured as the *false-mastery rate*.
 - **Dev / held-out split**: every third case is never inspected while the rules are improved.
+- **LLM-only baseline** (`make eval-llm-baseline`, `evaluation/llm_only.py`): the same cases go to one prompt that carries the same curriculum key, with no harness. The baseline reports false mastery, answer give-away, safety catch, raw personal data sent to the provider, and consistency. This answers "why not just prompt an LLM?" with a measurement. It needs an API key, and no real-model run has been recorded yet.
 
 Latest rules-mode results (`backend/evaluation/reports/latest.md`):
 

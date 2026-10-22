@@ -13,6 +13,7 @@ a freshly seeded DB (`make seed`), ffmpeg on PATH, and Playwright's Chromium
 
 import asyncio
 import base64
+import os
 import shutil
 import subprocess
 import sys
@@ -23,7 +24,7 @@ from pathlib import Path
 from playwright.async_api import Page, async_playwright
 
 BASE = "http://localhost:3000"
-API = "http://localhost:8000"
+API = os.environ.get("CURIO_API_URL", "http://localhost:8000")
 ROOT = Path(__file__).resolve().parent.parent
 SHORT = "--short" in sys.argv
 _args = [a for a in sys.argv[1:] if not a.startswith("--")]

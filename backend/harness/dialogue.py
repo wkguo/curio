@@ -8,7 +8,7 @@ the transfer question — the student is never stuck in a loop.
 from dataclasses import dataclass
 
 from harness.context import GradingKey
-from harness.text import matches, normalize
+from harness.text import is_dont_know, matches, normalize
 from schemas.curriculum import Topic
 from schemas.enums import TeachingStrategy
 from schemas.harness import TeachingResponse
@@ -21,6 +21,7 @@ class DialogueOutcome:
     resolved: bool
     misconception_reappeared: bool
     response: TeachingResponse
+    dont_know: bool = False
 
 
 def evaluate_reply(
@@ -56,6 +57,9 @@ def evaluate_reply(
             ),
         )
 
+    # "I don't know" is honest, not wrong: never answer it with "getting closer".
+    dont_know = not reappeared and is_dont_know(text)  # `text` is already normalized
+
     if turn >= MAX_TURNS:
         idea = m.corrective_target if m else key.expected_answer
         return DialogueOutcome(
@@ -64,20 +68,26 @@ def evaluate_reply(
             TeachingResponse(
                 strategy=TeachingStrategy.DIRECT_HINT,
                 messages=[
-                    "Thanks for thinking so hard about this! 💪",
+                    "That's okay — not knowing yet is where learning starts. 🌱" if dont_know else "Thanks for thinking so hard about this! 💪",
                     f"Here's the key idea: **{idea}**",
                     "Let's try using it on a new example.",
                 ],
                 key_idea=idea,
                 ready_for_transfer=True,
             ),
+            dont_know,
         )
 
     # Try a different angle: next authored strategy for the misconception, else a hint.
     if m:
         for strategy, block in m.teaching.items():
             if strategy.value != strategy_used:
-                lead = "Hmm, not quite yet — let's try another way. 🤔" if not reappeared else "I can see why it feels that way! Let's test it differently. 🤔"
+                if dont_know:
+                    lead = "That's okay! Let's look at it another way. 🌱"
+                elif reappeared:
+                    lead = "I can see why it feels that way! Let's test it differently. 🤔"
+                else:
+                    lead = "Hmm, not quite yet — let's try another way. 🤔"
                 return DialogueOutcome(
                     False,
                     reappeared,
@@ -88,6 +98,7 @@ def evaluate_reply(
                         visual=block.visual,
                         key_idea=m.corrective_target,
                     ),
+                    dont_know,
                 )
     hint = key.hints[min(turn, len(key.hints) - 1)] if key.hints else None
     target = key.point_text[missing_points[0]] if missing_points else key.expected_answer
@@ -96,8 +107,12 @@ def evaluate_reply(
         reappeared,
         TeachingResponse(
             strategy=TeachingStrategy.DIRECT_HINT,
-            messages=["Getting closer! 🔍", f"Hint 💡 — {hint}" if hint else "Think about what causes it."],
+            messages=[
+                "That's okay — let's take a smaller step. 🌱" if dont_know else "Getting closer! 🔍",
+                f"Hint 💡 — {hint}" if hint else "Think about what causes it.",
+            ],
             follow_up=f"Can you explain it using this idea: “{target[0].lower()}{target[1:]}”?" if turn >= 1 else "What do you think now?",
             key_idea=target,
         ),
+        dont_know,
     )

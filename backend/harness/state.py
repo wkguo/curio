@@ -18,6 +18,9 @@ from schemas.enums import LearningPhase as P
 from schemas.harness import Diagnosis, LearningState, StateTransition
 
 MAX_TRANSFER_ATTEMPTS = 2
+# "I don't know" this many times in a row (answer, dialogue, transfer) = stuck: a failed
+# transfer then ends the question (key idea shown, teacher flagged) instead of asking again.
+DONT_KNOW_LIMIT = 3
 
 ALLOWED: dict[P, set[P]] = {
     P.ATTEMPT: {P.BLOCKED, P.CLARIFYING, P.TEACHING, P.TRANSFER},

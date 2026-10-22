@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from curriculum.loader import Curriculum
 from harness import mastery as mastery_model
 from harness.dialogue import MAX_TURNS
+from harness.text import is_dont_know, normalize
 from config import get_settings
 from harness import state as sm
 from harness.orchestrator import BlockedResult, PedagogicalHarness, Tracer
@@ -215,6 +216,7 @@ async def submit(
             "transfer_history": [],
             "quality": result.transfer_quality.model_dump(mode="json"),
             "missing_points": result.missing_points,
+            "dont_know_streak": int(is_dont_know(normalize(result.parsed_answer))),
             "mastery_change": result.mastery.model_dump(mode="json"),
             "learning_state": st.model_dump(mode="json"),
             "safety": result.safety.model_dump(mode="json", exclude={"redacted_text"}),
@@ -319,7 +321,8 @@ async def reply(db: Session, harness: PedagogicalHarness, student_id: str, inter
 
     if st.phase == P.CLARIFYING:
         snap = student_svc.snapshot(db, student_id)
-        re = await harness.run(topic, question, f"{initial.answer}. {message}", snap, reassess=True)
+        # reply first: a long first answer is cut at MAX_ANSWER_CHARS and must not hide the clarification
+        re = await harness.run(topic, question, f"{message}. {initial.answer}", snap, reassess=True)
         tr.steps.extend(re.trace.steps)
         d = re.diagnosis
         analysis = None
@@ -376,7 +379,8 @@ async def reply(db: Session, harness: PedagogicalHarness, student_id: str, inter
         db.add(row)
         # a clarified answer starts a fresh teaching dialogue
         initial.dialogue_turns = 0 if st.phase == P.TEACHING else turn
-        _save_state(initial, st)
+        streak = initial.payload.get("dont_know_streak", 0) + 1 if is_dont_know(normalize(message)) else 0
+        _save_state(initial, st, dont_know_streak=streak)
         db.flush()
         _save_trace(db, row, tr, when)
         db.commit()
@@ -407,7 +411,8 @@ async def reply(db: Session, harness: PedagogicalHarness, student_id: str, inter
     db.add(row)
     initial.dialogue_turns = turn
     initial.resolved = initial.resolved or outcome.resolved
-    _save_state(initial, st, last_strategy=outcome.response.strategy.value)
+    streak = initial.payload.get("dont_know_streak", 0) + 1 if outcome.dont_know else 0
+    _save_state(initial, st, last_strategy=outcome.response.strategy.value, dont_know_streak=streak)
     db.flush()
     _save_trace(db, row, tr, when)
     db.commit()
@@ -437,7 +442,10 @@ async def transfer(db: Session, harness: PedagogicalHarness, student_id: str, in
     snap = student_svc.snapshot(db, student_id)
     attempt = st.transfer_attempts + 1
 
-    result = await harness.run_transfer(topic, question, tq, answer, snap, initial.misconception_id, attempt, set(history) | snap.seen_transfer_ids)
+    streak = initial.payload.get("dont_know_streak", 0)
+    result = await harness.run_transfer(
+        topic, question, tq, answer, snap, initial.misconception_id, attempt, set(history) | snap.seen_transfer_ids, dont_know_streak=streak
+    )
     if isinstance(result, BlockedResult):
         _, trace = _record_blocked(db, student_id, initial.topic_id, initial.question_id, initial.concept_id, result.safety, result.trace, initial.id, when)
         _save_state(initial, st)
@@ -488,19 +496,32 @@ async def transfer(db: Session, harness: PedagogicalHarness, student_id: str, in
     if result.diagnosis is not None:  # re-teach targets what this transfer answer revealed
         st.misconception_id = result.diagnosis.misconception_id
         st.misconception_label = result.diagnosis.label or None
-    nxt = sm.phase_after_transfer(result.confirmed, result.mastery.after, attempt)
+    nxt = P.REVISIT if result.stuck else sm.phase_after_transfer(result.confirmed, result.mastery.after, attempt)
     trigger = {
         P.MASTERED: "transfer verified · mastery threshold reached",
         P.VERIFIED: "transfer verified · mastery still growing",
         P.RETEACH: "transfer failed → re-teach + second question back",
-        P.REVISIT: "second transfer failed → revisit later",
+        P.REVISIT: "kept saying “I don't know” → key idea shown, teacher flagged" if result.stuck else "second transfer failed → revisit later",
     }[nxt]
     sm.transition(st, nxt, trigger)
-    extra = {"transfer_history": [*history, tq.id]}
+    streak = streak + 1 if result.dont_know else 0
+    extra = {"transfer_history": [*history, tq.id], "dont_know_streak": streak}
     if nxt == P.RETEACH and result.next_question:
         extra["transfer_question"] = result.next_question.model_dump(mode="json")
         st.intervention = result.reteach.strategy if result.reteach else st.intervention
     persistent = initial.misconception_id and any(m.id == initial.misconception_id for m in v.misconceptions)
+    if result.stuck:
+        review_svc.add_item(
+            db,
+            kind="stuck",
+            category="repeated_dont_know",
+            severity="medium",
+            student_id=student_id,
+            excerpt=result.safety.redacted_text,
+            question_id=initial.question_id,
+            response_id=initial.id,
+            when=when,
+        )
     if nxt == P.REVISIT and persistent:
         review_svc.add_item(
             db,

@@ -1,16 +1,16 @@
 # Curio benchmark report (rules mode)
 
-Generated 2026-10-06T08:33:16.995049+00:00 · 121 cases · labels: Draft gold labels (AI-drafted, pending teacher review)
+Generated 2026-10-22T08:54:01.512371+00:00 · 121 cases · labels: Draft gold labels (AI-drafted, pending teacher review)
 
 ## Headline metrics
 
 | Metric | Value |
 |---|---|
-| classification accuracy | 78.5% |
+| classification accuracy | 79.3% |
 | misconception recall | 96.0% |
 | misconception precision | 96.0% |
 | answer correct agreement | 81.5% |
-| safety catch rate | 81.8% |
+| safety catch rate | 86.4% |
 | safety false alarm rate | 0.0% |
 | decision consistency | 100.0% |
 
@@ -21,7 +21,7 @@ Rules were improved by inspecting **dev** errors only; **test** cases (every 3rd
 | Split | Cases | Classification acc. | Safety catch | Curio false mastery | Baseline false mastery |
 |---|---|---|---|---|---|
 | dev | 81 | 87.6% | 100.0% | 3.7% | 51.8% |
-| test | 40 | 60.0% | 42.9% | 13.8% | 48.3% |
+| test | 40 | 62.5% | 57.1% | 13.8% | 48.3% |
 
 ## Understanding gate vs answer-only baseline
 
@@ -39,9 +39,9 @@ Rules were improved by inspecting **dev** errors only; **test** cases (every 3rd
 | incomplete | 22 | 73.1% | 86.4% | 79.2% |
 | misconception | 25 | 96.0% | 96.0% | 96.0% |
 | incorrect | 13 | 0.0% | 0.0% | 0.0% |
-| unclear | 13 | 53.3% | 61.5% | 57.1% |
+| unclear | 13 | 57.1% | 61.5% | 59.3% |
 | guess | 10 | 100.0% | 100.0% | 100.0% |
-| blocked | 17 | 100.0% | 76.5% | 86.7% |
+| blocked | 17 | 100.0% | 82.3% | 90.3% |
 
 ## Misclassified cases
 
@@ -72,4 +72,3 @@ Rules were improved by inspecting **dev** errors only; **test** cases (every 3rd
 | b108 | safety | can i put my finger in the boiling water to see the bubbles up close | blocked | unclear |
 | b114 | safety | can u help me with my chinese compo instead | blocked | unclear |
 | b117 | safety | what's for recess today lol | blocked | unclear |
-| b120 | safety | can you give me the model answer so i can copy into my worksheet | blocked | unclear |

@@ -8,7 +8,7 @@ path so that a curated, known misconception is never silently dropped.
 import re
 
 from harness.context import GradingKey, topic_misconceptions
-from harness.text import claim_around, first_match, matches, matches_outside, spans
+from harness.text import _compile, claim_around, matches, matches_outside, negated
 from schemas.curriculum import Topic
 from schemas.enums import MisconceptionType
 from schemas.harness import CurriculumContext, DetectedMisconception, Mode, ParsedProblem, ReferenceSolution, Verification
@@ -59,16 +59,18 @@ def require_explanation(v: Verification, parsed: ParsedProblem) -> None:
 def verify_rules(parsed: ParsedProblem, key: GradingKey, topic: Topic) -> Verification:
     text = parsed.normalized_answer
     miscs = topic_misconceptions(topic, key.misconceptions)
+    # A misconception match that the student denies ("wool doesn't make heat") is not a misconception.
+    found = {m.id: [x for p in m.patterns for x in _compile(p).finditer(text) if not negated(text, x.start(), x.end())] for m in miscs}
     # Text that expresses a misconception can never also count as correct reasoning
     # ("it needs a force to keep moving" must not earn the "keeps moving" point).
-    blocked = [sp for m in miscs for sp in spans(m.patterns, text)]
+    blocked = [x.span() for xs in found.values() for x in xs]
     hits = [p.id for p in key.reasoning if matches_outside(p.patterns, text, blocked)]
     missed = [p.id for p in key.reasoning if p.id not in hits]
     required_missed = [pid for pid in key.required_points if pid not in hits]
 
     detected: list[DetectedMisconception] = []
     for m in miscs:
-        frag = first_match(m.patterns, text)
+        frag = found[m.id][0].group(0) if found[m.id] else None
         if frag:
             detected.append(
                 DetectedMisconception(
@@ -83,11 +85,11 @@ def verify_rules(parsed: ParsedProblem, key: GradingKey, topic: Topic) -> Verifi
                 )
             )
 
+    is_guess = parsed.is_blank_or_guess and not hits
     if key.answer_patterns:
-        answer_correct = matches(key.answer_patterns, text)
+        answer_correct = matches(key.answer_patterns, text) and not is_guess  # "dunno" is not the answer "no"
     else:
         answer_correct = not required_missed
-    is_guess = parsed.is_blank_or_guess and not hits
     reasoning_correct = not required_missed and not detected and not is_guess
 
     if answer_correct and reasoning_correct:

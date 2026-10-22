@@ -20,8 +20,9 @@ from harness.dialogue import DialogueOutcome, evaluate_reply
 from harness.misconception import classify_misconception, classify_rules
 from harness.problem_parser import parse_problem
 from harness.question_generator import generate_transfer_question, pick_next_transfer
-from harness.safety import screen_input
-from harness.state import MAX_TRANSFER_ATTEMPTS
+from harness.safety import check_output, screen_input
+from harness.state import DONT_KNOW_LIMIT, MAX_TRANSFER_ATTEMPTS
+from harness.text import is_dont_know
 from harness.reference_solver import solve_reference
 from harness.teaching_agent import build_feedback, teach
 from harness.teaching_policy import select_strategy
@@ -110,6 +111,8 @@ class TransferResult:
     diagnosis: Diagnosis | None = None
     reteach: TeachingResponse | None = None
     next_question: GeneratedQuestion | None = None
+    dont_know: bool = False  # this answer was a plain "I don't know"
+    stuck: bool = False  # repeated "I don't know": end the question, flag the teacher
 
 
 class PedagogicalHarness:
@@ -237,9 +240,11 @@ class PedagogicalHarness:
         initial_misconception: str | None,
         attempt: int = 1,
         seen_ids: set[str] | None = None,
+        dont_know_streak: int = 0,
     ) -> TransferResult | BlockedResult:
         """Score the question-back answer against the mastery criterion and pick the next
-        state: advance, or (once) re-enter teaching with a second transfer question."""
+        state: advance, or (once) re-enter teaching with a second transfer question.
+        `dont_know_streak` counts the student's consecutive "I don't know"s before this answer."""
         tr = Tracer()
         safety = self._screen(tr, answer, None)
         if not safety.allow_grading:
@@ -272,11 +277,16 @@ class PedagogicalHarness:
 
         confirmed = v.answer_correct and v.reasoning_correct
         repeated = any(m.id and m.id == initial_misconception for m in v.misconceptions)
-        will_reteach = not confirmed and attempt < MAX_TRANSFER_ATTEMPTS
+        dont_know = is_dont_know(parsed.normalized_answer)
+        stuck = dont_know and not confirmed and not v.misconceptions and dont_know_streak + 1 >= DONT_KNOW_LIMIT
+        will_reteach = not confirmed and attempt < MAX_TRANSFER_ATTEMPTS and not stuck
 
         with tr.step("feedback", "Feedback") as s:
-            feedback, s.mode = await self._transfer_feedback(key, answer, v, confirmed, topic, ctx, reveal=not will_reteach)
-            s.summary = "mastery confirmed" if confirmed else "not yet confirmed"
+            if stuck:  # more questions would only frustrate: show the idea, hand over to the teacher
+                feedback, s.mode = f"That's okay — this one is tricky. Here's how it works: {key.expected_answer} I've asked your teacher to go through it with you. 🤝", "rules"
+            else:
+                feedback, s.mode = await self._transfer_feedback(key, answer, v, confirmed, topic, ctx, reveal=not will_reteach)
+            s.summary = "mastery confirmed" if confirmed else "stuck → teacher" if stuck else "not yet confirmed"
             s.output = {"feedback": feedback}
 
         with tr.step("mastery", "Mastery Verification") as s:
@@ -289,7 +299,7 @@ class PedagogicalHarness:
             s.summary = f"{before:.2f} → {after:.2f} (evidence {evidence:+.1f})"
             s.output = change.model_dump()
 
-        result = TransferResult(v, confirmed, feedback, change, tr, safety)
+        result = TransferResult(v, confirmed, feedback, change, tr, safety, dont_know=dont_know, stuck=stuck)
         if will_reteach:
             # Re-enter the teaching/diagnostic cycle (proposal: mastery checker either
             # advances the student or re-enters teaching) — bounded to one extra attempt.
@@ -322,6 +332,8 @@ class PedagogicalHarness:
 
                 prompt = render("transfer_feedback", question=key.prompt, student_answer=answer, verification=v.model_dump_json(), confirmed=confirmed)
                 fb = await self.llm.generate(system_user(prompt), schema=_FB)
+                if (problems := check_output(fb.feedback)):
+                    raise LLMError("unsafe transfer feedback: " + ", ".join(problems))
                 return fb.feedback, "llm"
             except LLMError:
                 pass

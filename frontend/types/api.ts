@@ -272,7 +272,7 @@ export interface TraceStep {
 }
 
 export interface SafetyNotice {
-  category: "pii" | "unsafe" | "prompt_injection" | "off_topic" | "answer_request";
+  category: "pii" | "unsafe" | "prompt_injection" | "off_topic" | "answer_request" | "language";
   message: string;
   redactions: string[];
 }
@@ -451,7 +451,7 @@ export interface TraceDetail extends TraceSummary {
 
 export interface ReviewItem {
   id: string;
-  kind: "safety" | "deferred" | "persistent_misconception";
+  kind: "safety" | "deferred" | "persistent_misconception" | "stuck";
   category: string;
   severity: "high" | "medium" | "low" | "none";
   student_id: string;

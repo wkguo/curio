@@ -13,6 +13,7 @@ const STYLE: Record<SafetyNotice["category"], { icon: typeof Lock; tone: string;
   prompt_injection: { icon: ShieldCheck, tone: "border-ink-200 bg-white", title: "Science only" },
   off_topic: { icon: MessageCircleWarning, tone: "border-ink-200 bg-white", title: "Back to science" },
   answer_request: { icon: MessageCircleWarning, tone: "border-sun-200 bg-sun-50", title: "Let's work it out" },
+  language: { icon: MessageCircleWarning, tone: "border-ink-200 bg-white", title: "English, please" },
 };
 
 /** Message from the safety & privacy layer (proposal module 6). */
