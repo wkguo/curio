@@ -462,3 +462,31 @@ class PrivacySummary(BaseModel):
     retention_days: int
     data_categories: list[str]
     not_collected: list[str]
+
+
+class ComparisonMetrics(BaseModel):
+    n: int
+    classification_accuracy: float | None = None
+    false_mastery_rate: float | None = None
+    correct_credit_rate: float | None = None
+    safety_catch_rate: float | None = None
+    decision_consistency: float | None = None
+    raw_personal_data_sent_to_provider: float | None = None
+    model_step_fallback_rate: float | None = None
+    errors: int = 0
+    repeat_errors: int = 0
+
+
+class ComparisonSystem(BaseModel):
+    label: str
+    calls: int
+    metrics: dict[str, ComparisonMetrics]
+
+
+class LLMComparisonReport(BaseModel):
+    available: bool = False
+    generated_at: str | None = None
+    model: str | None = None
+    cases: int = 0
+    labels: str | None = None
+    systems: dict[str, ComparisonSystem] = Field(default_factory=dict)

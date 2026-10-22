@@ -4,7 +4,7 @@ import re
 
 import pytest
 
-from evaluation.llm_only import check_health, compare, select_cases, to_markdown
+from evaluation.llm_only import check_health, compare, run_comparison, select_cases, to_markdown
 from services.llm import LLMClient, LLMError
 
 
@@ -67,3 +67,64 @@ def test_limit_takes_evenly_spaced_cases_so_every_category_appears():
 
     cases = select_cases(yaml.safe_load(BENCHMARK.read_text())["cases"], 30)
     assert len(cases) == 30 and {c["category"] for c in cases} >= {"safety", "misconception", "correct"}
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("fail_ping", [False, True])
+async def test_cli_transport_stays_on_one_event_loop_and_always_closes(fail_ping):
+    import asyncio
+
+    class LoopBoundClient(OverTrustingLLM):
+        def __init__(self):
+            self.loop = None
+            self.closed = False
+
+        async def generate(self, messages, schema=None):
+            loop = asyncio.get_running_loop()
+            if self.loop is None:
+                self.loop = loop
+            assert loop is self.loop
+            if schema.__name__ == "Ping":
+                if fail_ping:
+                    raise LLMError("offline")
+                return schema(ok=True)
+            return await super().generate(messages, schema)
+
+        async def aclose(self):
+            assert asyncio.get_running_loop() is self.loop
+            self.closed = True
+
+    client = LoopBoundClient()
+    if fail_ping:
+        with pytest.raises(SystemExit, match="ABORT"):
+            await run_comparison(client, False, 2)
+    else:
+        report = await run_comparison(client, False, 2)
+        assert report["cases"] == 2
+    assert client.closed
+
+
+@pytest.mark.asyncio
+async def test_failed_repeat_judgements_cannot_slip_through_the_health_gate(monkeypatch):
+    import evaluation.llm_only as lo
+
+    async def no_wait(_):
+        pass
+
+    class RepeatFails(OverTrustingLLM):
+        seen = set()
+
+        async def generate(self, messages, schema=None):
+            prompt = messages[-1]["content"]
+            if prompt in self.seen:
+                raise LLMError("repeat failed")
+            self.seen.add(prompt)
+            return await super().generate(messages, schema)
+
+    monkeypatch.setattr(lo.asyncio, "sleep", no_wait)
+    rep = await compare(RepeatFails(), limit=6)
+    metrics = rep["systems"]["llm_only"]["metrics"]["all"]
+    assert metrics["errors"] == 0
+    assert metrics["repeat_errors"] == 6
+    with pytest.raises(SystemExit, match="ABORT"):
+        check_health(rep)

@@ -10,11 +10,11 @@ import { Card } from "@/components/ui/card";
 import { Emoji } from "@/components/ui/emoji";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip } from "@/components/ui/tooltip";
-import { api } from "@/lib/api";
-import { useEvaluation } from "@/lib/hooks";
+import { api, CurioError, FRIENDLY_ERROR } from "@/lib/api";
+import { useEvaluation, useLLMComparison, useOffline } from "@/lib/hooks";
 import { CLASSIFICATION, SAFETY_LABEL } from "@/lib/labels";
 import { cn, timeAgo } from "@/lib/utils";
-import type { Classification, EvalReport } from "@/types/api";
+import type { Classification, ComparisonMetrics, EvalReport } from "@/types/api";
 
 const f = (x: number | null | undefined) => (x == null ? "—" : `${(x * 100).toFixed(1)}%`);
 const CURIO = "#7C5CFF";
@@ -22,31 +22,87 @@ const BASE = "#F2703A";
 const CLASSES: Classification[] = ["correct", "incomplete", "misconception", "incorrect", "unclear", "guess", "blocked"];
 
 export default function EvaluationPage() {
-  const { data, mutate } = useEvaluation();
+  const { data, error, mutate } = useEvaluation();
+  const offline = useOffline();
   const [running, setRunning] = useState(false);
+  const [runError, setRunError] = useState<string | null>(null);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-8">
       <PageHeader
         eyebrow="Teacher view · evaluation"
         title="Benchmark & validation"
-        subtitle="A gold-labelled benchmark of correct, poor-reasoning, incomplete, misconception, ambiguous and safety cases — scored against the real harness, and against an answer-only baseline."
+        subtitle="A benchmark with draft labels awaiting teacher review. Compare answer and reasoning checks with an answer-only marker."
         actions={
           <Button
             variant="secondary"
-            disabled={running}
+            disabled={running || offline}
             onClick={async () => {
               setRunning(true);
-              await mutate(await api.runEvaluation(), { revalidate: false });
-              setRunning(false);
+              setRunError(null);
+              try {
+                await mutate(await api.runEvaluation(), { revalidate: false });
+              } catch (e) {
+                setRunError(e instanceof CurioError ? e.message : FRIENDLY_ERROR);
+              } finally {
+                setRunning(false);
+              }
             }}
           >
             <Play className={cn(running && "animate-pulse")} /> {running ? "Running…" : "Re-run benchmark"}
           </Button>
         }
       />
-      {!data ? <Skeleton className="mt-6 h-96" /> : <Report r={data} />}
+      {offline && <p role="status" className="mt-4 rounded-2xl bg-sun-50 p-3 text-sm font-bold text-sun-700">Recorded report. Connect to the live app to run a new evaluation.</p>}
+      {runError && <p role="alert" className="mt-4 text-sm font-bold text-coral-600">{runError}</p>}
+      <ModelComparison />
+      {!data && error ? (
+        <div role="alert" className="card-base mt-6 p-6">
+          <p className="mb-4 font-bold text-ink-700">The report could not load. Please try again.</p>
+          <Button variant="secondary" onClick={() => void mutate()}>Try again</Button>
+        </div>
+      ) : !data ? <Skeleton className="mt-6 h-96" /> : <Report r={data} />}
     </div>
+  );
+}
+
+function ModelComparison() {
+  const { data, error } = useLLMComparison();
+  const [split, setSplit] = useState<"test" | "all">("test");
+  if (!data?.available) return (
+    <Card className="mt-5 p-6">
+      <SectionTitle emoji={<FlaskConical className="h-5 w-5 text-curio-500" />}>Same-model comparison</SectionTitle>
+      <p className="text-sm font-semibold text-ink-600">{error ? "The model-comparison report could not load." : "No completed same-model comparison is available yet. The answer-only marker below is a rules baseline, not an LLM."}</p>
+    </Card>
+  );
+  const metrics: [keyof ComparisonMetrics, string][] = [
+    ["classification_accuracy", "Classification accuracy"],
+    ["false_mastery_rate", "False mastery · lower is better"],
+    ["correct_credit_rate", "Fully correct answers credited"],
+    ["safety_catch_rate", "Safety & privacy catch rate"],
+    ["decision_consistency", "Same decision on repeat"],
+    ["raw_personal_data_sent_to_provider", "Matched personal data sent to model"],
+  ];
+  const systems = Object.values(data.systems);
+  return (
+    <Card className="mt-5 p-6">
+      <SectionTitle emoji={<FlaskConical className="h-5 w-5 text-curio-500" />}>Same-model comparison</SectionTitle>
+      <p className="mb-3 text-sm font-semibold text-ink-600">{data.model} · {data.cases} cases · same curriculum key. Draft labels await teacher review. Results apply to this model and setup.</p>
+      <div className="mb-4 flex gap-2">
+        {(["test", "all"] as const).map((s) => (
+          <Button key={s} variant={split === s ? "default" : "secondary"} size="sm" onClick={() => setSplit(s)}>
+            {s === "test" ? "Held-out" : "All cases"}
+          </Button>
+        ))}
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[600px] text-left text-sm">
+          <thead><tr className="text-ink-500"><th className="py-3">Metric</th>{systems.map(s => <th key={s.label} className="px-3">{s.label}<span className="block text-xs">n={s.metrics[split].n}</span></th>)}</tr></thead>
+          <tbody>{metrics.map(([key, label]) => <tr key={key} className="border-t border-ink-100 font-bold text-ink-700"><td className="py-3">{label}</td>{systems.map(s => <td className="px-3 tabular-nums" key={s.label}>{f(s.metrics[split][key])}</td>)}</tr>)}</tbody>
+        </table>
+      </div>
+      <p className="mt-4 text-xs font-semibold leading-relaxed text-ink-500">False mastery here measures one answer against a draft label, not learning gains or mastery after teaching. Read it alongside correct-answer credit. Data masking uses the same patterns as redaction; it is a design check, not a test of every kind of personal data. One historical safety example informed the rules.</p>
+    </Card>
   );
 }
 
@@ -54,7 +110,7 @@ function Report({ r }: { r: EvalReport }) {
   const g = r.understanding_gate;
   const [filter, setFilter] = useState<"errors" | "all" | "test">("errors");
   const rows = useMemo(
-    () => r.cases.filter((c) => (filter === "all" ? true : filter === "test" ? c.split === "test" : !c.match)),
+    () => r.cases.filter((c) => (filter === "all" ? true : filter === "test" ? c.split === "test" : c.split === "dev" && !c.match)),
     [r.cases, filter],
   );
 
@@ -67,10 +123,10 @@ function Report({ r }: { r: EvalReport }) {
       {/* Research question */}
       <Card className="mt-5 overflow-hidden">
         <div className="grid gap-6 p-6 lg:grid-cols-[1fr_1.1fr]">
-          <div>
+          <div className="min-w-0">
             <SectionTitle emoji={<Emoji name="direct_hit" size={24} />}>Does verification stop false mastery?</SectionTitle>
             <p className="text-sm font-semibold leading-relaxed text-ink-600">
-              A typical auto-marked quiz credits the final answer. Curio requires the reasoning too. Among responses a teacher labelled as{" "}
+              An answer-only marker credits the final answer. Curio checks the reasoning too. Among responses with draft labels of{" "}
               <b>not showing understanding</b> (n={g.not_understood_cases}), how often would each grader wrongly credit mastery?
             </p>
             <div className="mt-5 space-y-4">
@@ -87,12 +143,12 @@ function Report({ r }: { r: EvalReport }) {
               </span>
             </div>
           </div>
-          <div>
+          <div className="min-w-0">
             <SectionTitle emoji={<FlaskConical className="h-5 w-5 text-curio-500" />}>Development vs held-out</SectionTitle>
             <p className="mb-3 text-sm font-semibold text-ink-600">
-              Rules were improved by looking at <b>dev</b> errors only. <b>Test</b> cases (every 3rd id) were never inspected, so they are the honest estimate. A large gap means the rules overfit.
+              Use <b>dev</b> examples to improve the rules; reserve <b>test</b> cases (every 3rd id) for evaluation. Labels await teacher review. One earlier safety change used a test example, so safety results are optimistic.
             </p>
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto"><table className="min-w-[450px] w-full text-sm">
               <thead>
                 <tr className="text-left text-[11px] font-extrabold uppercase tracking-wider text-ink-400">
                   <th className="py-1.5">Split</th>
@@ -118,7 +174,7 @@ function Report({ r }: { r: EvalReport }) {
                   );
                 })}
               </tbody>
-            </table>
+            </table></div>
           </div>
         </div>
       </Card>
@@ -133,12 +189,12 @@ function Report({ r }: { r: EvalReport }) {
         ))}
       </div>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <Card className="p-6">
+      <div className="mt-5 grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-2">
+        <Card className="min-w-0 p-6">
           <SectionTitle emoji={<Emoji name="puzzle_piece" size={24} />}>Confusion matrix (gold → predicted)</SectionTitle>
           <Confusion r={r} />
         </Card>
-        <Card className="p-6">
+        <Card className="min-w-0 p-6">
           <SectionTitle emoji={<Emoji name="warning" size={24} />}>Safety & privacy layer</SectionTitle>
           <ul className="space-y-3">
             {Object.entries(r.safety).map(([k, v]) => (
@@ -169,7 +225,7 @@ function Report({ r }: { r: EvalReport }) {
             <div className="flex gap-1 rounded-xl bg-ink-100 p-1 text-xs font-extrabold">
               {(["errors", "test", "all"] as const).map((k) => (
                 <button key={k} onClick={() => setFilter(k)} className={cn("rounded-lg px-3 py-1.5", filter === k ? "bg-white text-ink-900 shadow-soft" : "text-ink-500")}>
-                  {k === "errors" ? "Misclassified" : k === "test" ? "Held-out" : "All"}
+                  {k === "errors" ? "Dev errors" : k === "test" ? "Held-out" : "All"}
                 </button>
               ))}
             </div>
@@ -283,7 +339,7 @@ function Confusion({ r }: { r: EvalReport }) {
           ))}
         </tbody>
       </table>
-      <p className="mt-2 text-[11px] font-bold text-ink-400">Green = agreement with the teacher label; orange = disagreement. Rows: gold; columns: Curio.</p>
+      <p className="mt-2 text-[11px] font-bold text-ink-400">Green = agreement with the draft label; orange = disagreement. Rows: draft label; columns: Curio.</p>
     </div>
   );
 }

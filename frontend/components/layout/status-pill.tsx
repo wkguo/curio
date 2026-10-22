@@ -11,12 +11,15 @@ export function StatusPill({ className }: { className?: string }) {
   const { data } = useHealth();
   if (offline) {
     return (
-      <Tooltip content="Backend not reachable — showing recorded demo data. Start the FastAPI server for the live harness.">
+      <Tooltip content="Recorded demo: responses and scores are replayed, not calculated from what you type.">
         <span className={cn("inline-flex items-center gap-1.5 rounded-full bg-sun-100 px-2.5 py-1 text-[11px] font-extrabold text-sun-700", className)}>
-          <WifiOff className="h-3.5 w-3.5" /> Offline demo
+          <WifiOff className="h-3.5 w-3.5" /> Recorded demo
         </span>
       </Tooltip>
     );
+  }
+  if (!data) {
+    return <span role="status" className={cn("inline-flex items-center gap-1.5 rounded-full bg-ink-100 px-2.5 py-1 text-[11px] font-extrabold text-ink-500", className)}>Connecting…</span>;
   }
   const llm = data?.llm_available;
   return (

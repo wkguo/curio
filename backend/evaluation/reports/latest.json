@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-22T08:54:01.512371+00:00",
+ "generated_at": "2026-10-22T14:41:58.419191+00:00",
  "mode": "rules",
  "benchmark": {
   "path": "evaluation/benchmark.yaml",
@@ -8,7 +8,7 @@
   "cases": 121
  },
  "metrics": {
-  "classification_accuracy": 0.7934,
+  "classification_accuracy": 0.7851,
   "misconception_recall": 0.96,
   "misconception_precision": 0.96,
   "answer_correct_agreement": 0.8148,
@@ -19,12 +19,12 @@
  "understanding_gate": {
   "not_understood_cases": 83,
   "understood_cases": 21,
-  "curio_false_mastery_rate": 0.0723,
+  "curio_false_mastery_rate": 0.0482,
   "baseline_false_mastery_rate": 0.506,
   "curio_correct_credit_rate": 1.0,
   "baseline_correct_credit_rate": 1.0,
   "poor_reasoning_cases": 18,
-  "curio_false_mastery_on_poor_reasoning": 0.2778,
+  "curio_false_mastery_on_poor_reasoning": 0.1667,
   "baseline_false_mastery_on_poor_reasoning": 0.9444
  },
  "by_split": {
@@ -37,24 +37,24 @@
   },
   "test": {
    "cases": 40,
-   "classification_accuracy": 0.625,
+   "classification_accuracy": 0.6,
    "safety_catch_rate": 0.5714,
-   "curio_false_mastery_rate": 0.1379,
+   "curio_false_mastery_rate": 0.069,
    "baseline_false_mastery_rate": 0.4828
   }
  },
  "per_class": {
   "correct": {
    "support": 21,
-   "precision": 0.7778,
+   "precision": 0.84,
    "recall": 1.0,
-   "f1": 0.875
+   "f1": 0.913
   },
   "incomplete": {
    "support": 22,
-   "precision": 0.7308,
-   "recall": 0.8636,
-   "f1": 0.7917
+   "precision": 0.6667,
+   "recall": 0.8182,
+   "f1": 0.7347
   },
   "misconception": {
    "support": 25,
@@ -92,17 +92,17 @@
    "correct": 21
   },
   "incomplete": {
-   "incomplete": 19,
-   "unclear": 1,
-   "incorrect": 2
+   "incomplete": 18,
+   "incorrect": 3,
+   "unclear": 1
   },
   "misconception": {
    "misconception": 24,
    "incomplete": 1
   },
   "incorrect": {
-   "incomplete": 4,
-   "correct": 6,
+   "incomplete": 6,
+   "correct": 4,
    "unclear": 2,
    "misconception": 1
   },
@@ -160,7 +160,7 @@
   },
   "incomplete": {
    "cases": 18,
-   "accuracy": 0.8889
+   "accuracy": 0.8333
   },
   "misconception": {
    "cases": 17,
@@ -788,19 +788,19 @@
     "safety": "none"
    },
    "pred": {
-    "classification": "incomplete",
+    "classification": "incorrect",
     "safety": "none",
     "misconception_id": null,
     "answer_correct": false,
-    "strategy": "SOCRATIC_QUESTION",
-    "mastery_after": 0.64,
+    "strategy": "DIRECT_HINT",
+    "mastery_after": 0.6,
     "baseline_credit": false,
-    "first_reply": "Hmm, let's check the reason together. 🔍 A scientist always explains *why*. Let's find the missing step together. What happens to metal on a very hot day?",
+    "first_reply": "Hmm, let's check the reason together. 🔍 Here's a hint 💡 — think about this: the metal gains heat and expands. What happens to metal on a very hot day?",
     "llm_steps": 0,
     "fallback_steps": 0
    },
    "consistent": true,
-   "match": true
+   "match": false
   },
   {
    "id": "b025",
@@ -865,14 +865,14 @@
     "safety": "none"
    },
    "pred": {
-    "classification": "correct",
+    "classification": "incomplete",
     "safety": "none",
     "misconception_id": null,
     "answer_correct": true,
-    "strategy": "TRANSFER_EXAMPLE",
-    "mastery_after": 0.7,
+    "strategy": "SOCRATIC_QUESTION",
+    "mastery_after": 0.64,
     "baseline_credit": true,
-    "first_reply": "You nailed both the answer **and** the reason. 🌟 Real understanding means you can use an idea in a brand-new situation. Ready for a twist? ",
+    "first_reply": "Good start! ✅ You're on the right track. A scientist always explains *why*. Let's find the missing step together. What tool do scientists use to measure temperature?",
     "llm_steps": 0,
     "fallback_steps": 0
    },
@@ -898,7 +898,7 @@
     "strategy": "SOCRATIC_QUESTION",
     "mastery_after": 0.64,
     "baseline_credit": true,
-    "first_reply": "Good start! ✅ You're on the right track. A scientist always explains *why*. Let's find the missing step together. What tool do scientists use to measure temperature?",
+    "first_reply": "Hmm, let's check the reason together. 🔍 A scientist always explains *why*. Let's find the missing step together. What tool do scientists use to measure temperature?",
     "llm_steps": 0,
     "fallback_steps": 0
    },
@@ -1649,14 +1649,14 @@
     "safety": "none"
    },
    "pred": {
-    "classification": "correct",
+    "classification": "incomplete",
     "safety": "none",
     "misconception_id": null,
     "answer_correct": true,
-    "strategy": "TRANSFER_EXAMPLE",
-    "mastery_after": 0.7,
+    "strategy": "SOCRATIC_QUESTION",
+    "mastery_after": 0.64,
     "baseline_credit": true,
-    "first_reply": "You nailed both the answer **and** the reason. 🌟 Real understanding means you can use an idea in a brand-new situation. Ready for a twist? ",
+    "first_reply": "Good start! ✅ You're on the right track. A scientist always explains *why*. Let's find the missing step together. Does the astronaut lose any part of his body on the way to the Moon?",
     "llm_steps": 0,
     "fallback_steps": 0
    },

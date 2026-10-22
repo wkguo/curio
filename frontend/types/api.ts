@@ -528,3 +528,25 @@ export interface EvalReport {
   by_category: Record<string, { cases: number; accuracy: number | null }>;
   cases: EvalCase[];
 }
+
+export interface ComparisonMetrics {
+  n: number;
+  classification_accuracy: number | null;
+  false_mastery_rate: number | null;
+  correct_credit_rate: number | null;
+  safety_catch_rate: number | null;
+  decision_consistency: number | null;
+  raw_personal_data_sent_to_provider: number | null;
+  model_step_fallback_rate: number | null;
+  errors: number;
+  repeat_errors: number;
+}
+
+export interface LLMComparisonReport {
+  available: boolean;
+  generated_at?: string | null;
+  model?: string | null;
+  cases: number;
+  labels?: string | null;
+  systems: Record<string, { label: string; calls: number; metrics: Record<string, ComparisonMetrics> }>;
+}

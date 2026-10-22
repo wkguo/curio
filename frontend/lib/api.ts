@@ -14,6 +14,7 @@ import type {
   Dashboard,
   EvalReport,
   Health,
+  LLMComparisonReport,
   Pathway,
   PrivacySummary,
   ReplyResponse,
@@ -72,11 +73,20 @@ interface Fixtures {
   pathways: Pathway[];
   privacy: PrivacySummary;
   evaluation: EvalReport;
+  llm_comparison?: LLMComparisonReport;
 }
 
 let fixturesPromise: Promise<Fixtures> | null = null;
 function fixtures(): Promise<Fixtures> {
-  fixturesPromise ??= fetch("/mock/fixtures.json").then((r) => r.json());
+  fixturesPromise ??= fetch("/mock/fixtures.json")
+    .then((r) => {
+      if (!r.ok) throw new CurioError("The recorded demo could not load. Please try again.");
+      return r.json();
+    })
+    .catch(() => {
+      fixturesPromise = null;
+      throw new CurioError("The recorded demo could not load. Please try again.");
+    });
   return fixturesPromise;
 }
 
@@ -86,7 +96,7 @@ function applyOverlay<T extends { mastery: number; id: string }>(c: T): T {
   return c.id in overlay ? { ...c, mastery: overlay[c.id], status: overlay[c.id] >= 0.75 ? "mastered" : (c as any).status } : c;
 }
 
-async function request<T>(path: string, init: RequestInit | undefined, mock: (fx: Fixtures) => T): Promise<T> {
+async function request<T>(path: string, init: RequestInit | undefined, mock: (fx: Fixtures) => T, allowReplay = true): Promise<T> {
   if (!forcedOffline) {
     let res: Response | null = null;
     try {
@@ -110,6 +120,7 @@ async function request<T>(path: string, init: RequestInit | undefined, mock: (fx
     }
   }
   offlineStore.set(true);
+  if (!allowReplay) throw new CurioError("This action needs a live connection. Please reconnect and check its status.");
   const fx = await fixtures();
   return mock(fx);
 }
@@ -146,7 +157,7 @@ export const api = {
     }),
   queue: (status = "open") => request<ReviewItem[]>(`/api/teacher/queue?status=${status}`, undefined, (fx) => fx.queue),
   resolveQueue: (id: string, note = "") =>
-    request<{ ok: boolean }>(`/api/teacher/queue/${id}/resolve`, post({ note }), () => ({ ok: true })),
+    request<{ ok: boolean }>(`/api/teacher/queue/${id}/resolve`, post({ note }), () => ({ ok: true }), false),
   pathways: (topicId?: string) =>
     request<Pathway[]>(`/api/teacher/pathways${topicId ? `?topic_id=${topicId}` : ""}`, undefined, (fx) =>
       topicId ? fx.pathways.filter((p) => p.topic_id === topicId) : fx.pathways,
@@ -157,12 +168,13 @@ export const api = {
       review_status: status,
       reviewer,
       review_note: note,
-    })),
+    }), false),
   privacy: (studentId: string) => request<PrivacySummary>(`/api/privacy/students/${studentId}`, undefined, (fx) => fx.privacy),
   deleteData: (studentId: string) =>
-    request<{ ok: boolean }>(`/api/privacy/students/${studentId}`, { method: "DELETE" }, () => ({ ok: true })),
+    request<{ ok: boolean }>(`/api/privacy/students/${studentId}`, { method: "DELETE" }, () => ({ ok: true }), false),
   evaluation: () => request<EvalReport>("/api/evaluation/report", undefined, (fx) => fx.evaluation),
-  runEvaluation: () => request<EvalReport>("/api/evaluation/run?mode=rules", { method: "POST" }, (fx) => fx.evaluation),
+  llmComparison: () => request<LLMComparisonReport>("/api/evaluation/llm-baseline", undefined, (fx) => fx.llm_comparison ?? { available: false, cases: 0, systems: {} }),
+  runEvaluation: () => request<EvalReport>("/api/evaluation/run?mode=rules", { method: "POST" }, (fx) => fx.evaluation, false),
   submit: (studentId: string, questionId: string, answer: string, sessionId?: string) =>
     request<SubmitResponse>(
       "/api/learning/submit",

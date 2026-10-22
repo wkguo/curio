@@ -8,7 +8,7 @@ the transfer question — the student is never stuck in a loop.
 from dataclasses import dataclass
 
 from harness.context import GradingKey
-from harness.text import is_dont_know, matches, normalize
+from harness.text import _compile, is_dont_know, matches_reasoning, negated, normalize
 from schemas.curriculum import Topic
 from schemas.enums import TeachingStrategy
 from schemas.harness import TeachingResponse
@@ -35,14 +35,15 @@ def evaluate_reply(
 ) -> DialogueOutcome:
     text = normalize(reply)
     m = topic.misconception(misconception_id) if misconception_id else None
-    reappeared = bool(m and matches(m.patterns, text))
+    reappeared = bool(m and any(not negated(text, hit.start(), hit.end()) for p in m.patterns for hit in _compile(p).finditer(text)))
+    dont_know = is_dont_know(text)
 
-    hit_missing = [pid for pid in missing_points if matches(next(p.patterns for p in key.reasoning if p.id == pid), text)]
-    resolved = not reappeared and (
-        (m is not None and matches(m.resolution_patterns, text)) or (bool(missing_points) and len(hit_missing) == len(missing_points))
+    hit_missing = [pid for pid in missing_points if matches_reasoning(next(p.patterns for p in key.reasoning if p.id == pid), text, [])]
+    resolved = not reappeared and not dont_know and (
+        (m is not None and matches_reasoning(m.resolution_patterns, text, [])) or (bool(missing_points) and len(hit_missing) == len(missing_points))
     )
     if m is None and not missing_points:
-        resolved = not reappeared
+        resolved = not reappeared and not dont_know
 
     if resolved:
         confirm = m.confirm if (m and m.confirm) else [f"Exactly! 🎉 {key.point_text[missing_points[0]]}" if missing_points else "Exactly! 🎉"]
@@ -58,7 +59,7 @@ def evaluate_reply(
         )
 
     # "I don't know" is honest, not wrong: never answer it with "getting closer".
-    dont_know = not reappeared and is_dont_know(text)  # `text` is already normalized
+    dont_know = not reappeared and dont_know
 
     if turn >= MAX_TURNS:
         idea = m.corrective_target if m else key.expected_answer
@@ -108,7 +109,7 @@ def evaluate_reply(
         TeachingResponse(
             strategy=TeachingStrategy.DIRECT_HINT,
             messages=[
-                "That's okay — let's take a smaller step. 🌱" if dont_know else "Getting closer! 🔍",
+                "That's okay — let's take a smaller step. 🌱" if dont_know else "Let's check that idea together. 🔍",
                 f"Hint 💡 — {hint}" if hint else "Think about what causes it.",
             ],
             follow_up=f"Can you explain it using this idea: “{target[0].lower()}{target[1:]}”?" if turn >= 1 else "What do you think now?",

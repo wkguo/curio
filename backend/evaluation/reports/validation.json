@@ -1,0 +1,39 @@
+{
+  "backend_tests_passed": 131,
+  "curriculum_linter": "passed",
+  "typescript": "passed",
+  "production_build": "passed",
+  "browser_checks": [
+    "Live dashboard identifies rules mode",
+    "Failed benchmark action shows error and recovers its button",
+    "Failed content approval reports an error and restores its button",
+    "Mobile learning handles startup failure, retries and fits 390px",
+    "Mobile evaluation fits 390px and renders the comparison (synthetic UI fixture)",
+    "Offline learning explicitly says recorded answers are replayed",
+    "Offline privacy does not simulate successful deletion",
+    "Offline content review cannot simulate a saved approval",
+    "Offline teacher queue cannot simulate resolving an item (synthetic UI fixture)",
+    "Offline evaluation cannot pretend to run a new benchmark"
+  ],
+  "browser_script": "scripts/check_ui.py",
+  "backend_port": 8765,
+  "frontend_port": 3765,
+  "database": "temporary, isolated from backend/curio.db",
+  "demo_mastery": [
+    0.52,
+    0.56,
+    0.76
+  ],
+  "independent_subagent_review": false,
+  "landing_layout_widths_checked": [
+    390,
+    1440
+  ],
+  "dev_script_shell_syntax": "passed",
+  "completed_comparison_checks": [
+    "Public endpoint matches saved metrics and excludes per-case baseline answers",
+    "Recorded fixture matches the public aggregate endpoint",
+    "Real 121-case comparison renders held-out and all-case metrics in live desktop, live mobile and recorded mobile modes"
+  ],
+  "pdf_pages": 6
+}

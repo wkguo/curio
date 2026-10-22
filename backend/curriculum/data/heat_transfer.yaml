@@ -507,11 +507,15 @@ questions:
     expected_reasoning:
       - id: touch_unreliable
         point: Touch is not a reliable way to judge temperature.
-        patterns: ["(not|isn't|cannot|can't).{0,20}(reliable|accurate|trust)", "(hand|hands|skin).{0,40}(different|was|were|before)"]
+        patterns:
+          - "(touch|feeling|feelings|hands?|skin).{0,25}(not|isn't|aren't|cannot|can't).{0,15}(reliable|accurate|trust)"
+          - "(cannot|can't).{0,10}trust.{0,15}(touch|feeling|hands?|skin)"
+          - "(touch|feeling|feelings).{0,15}unreliable"
+          - "(hands?|skin).{0,20}(were|was|at).{0,15}different temperatures"
       - id: use_thermometer
         point: A thermometer measures temperature accurately.
         patterns: ["thermometer"]
-    required_points: [use_thermometer]
+    required_points: [touch_unreliable, use_thermometer]
     misconceptions: []
     hints:
       - What tool do scientists use to measure temperature?
@@ -526,10 +530,17 @@ questions:
         answer_patterns: ["thermometer"]
         expected_answer: Use a thermometer, because feelings of hot and cold depend on what your body was touching before.
         expected_reasoning:
+          - id: touch_unreliable
+            point: Feelings of hot and cold are not a reliable way to judge temperature.
+            patterns:
+              - "(touch|feeling|feelings|hands?|skin).{0,25}(not|isn't|aren't|cannot|can't).{0,15}(reliable|accurate|trust)"
+              - "(cannot|can't).{0,10}trust.{0,15}(touch|feeling|hands?|skin)"
+              - "(touch|feeling|feelings).{0,15}unreliable"
+              - "(feel|feels|feeling|feelings).{0,20}depend.{0,40}(before|previous|earlier)"
           - id: use_thermometer
             point: Use a thermometer to measure temperature.
             patterns: ["thermometer"]
-        required_points: [use_thermometer]
+        required_points: [touch_unreliable, use_thermometer]
         demo_answer: They should use a thermometer because feeling is not reliable.
 
       - id: heat_006_t2
@@ -538,10 +549,17 @@ questions:
         answer_patterns: ["thermometer"]
         expected_answer: Measure the water with a thermometer, because how hot or cold something feels depends on what your skin touched before, so touch is not reliable.
         expected_reasoning:
+          - id: touch_unreliable
+            point: Touch is unreliable because feelings depend on what the skin touched before.
+            patterns:
+              - "(touch|feeling|feelings|hands?|skin).{0,25}(not|isn't|aren't|cannot|can't).{0,15}(reliable|accurate|trust)"
+              - "(cannot|can't).{0,10}trust.{0,15}(touch|feeling|hands?|skin)"
+              - "(touch|feeling|feelings).{0,15}unreliable"
+              - "(feel|feels|feeling|feelings).{0,20}depend.{0,40}(before|previous|earlier)"
           - id: use_thermometer
             point: Use a thermometer to measure temperature.
             patterns: ["thermometer"]
-        required_points: [use_thermometer]
+        required_points: [touch_unreliable, use_thermometer]
         demo_answer: They should measure the water with a thermometer, because touch is not reliable.
 
   - id: heat_007

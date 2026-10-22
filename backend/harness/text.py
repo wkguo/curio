@@ -10,7 +10,7 @@ _GUESS = re.compile(
 )
 
 
-_CONTRACTIONS = re.compile(r"\b(do|does|did|is|are|was|were|can|could|should|would|won|have|has|had)nt\b", re.IGNORECASE)
+_CONTRACTIONS = re.compile(r"\b(do|does|did|is|are|was|were|ca|could|should|would|wo|have|has|had)nt\b", re.IGNORECASE)
 
 
 def normalize(text: str) -> str:
@@ -40,6 +40,39 @@ def spans(patterns: list[str], text: str) -> list[tuple[int, int]]:
 def matches_outside(patterns: list[str], text: str, blocked: list[tuple[int, int]]) -> bool:
     """True if some match of `patterns` does not overlap any blocked span."""
     return any(all(e <= bs or s >= be for bs, be in blocked) for s, e in spans(patterns, text))
+
+
+_REASONING_DENIAL = r"(?:\b(?:not|never|cannot)\b|\b[a-z]+n't\b)"
+_CLAUSE_BREAK = r"(?:[.!?;,:]|\b(?:because|but|so|although|whereas)\b)"
+_DENIED_PREFIX = re.compile(
+    _REASONING_DENIAL + r"\s+(?:(?!(?:only|just|and)\b)(?!" + _CLAUSE_BREAK + r")[a-z']+\s+){0,7}$"
+)
+_BOUNDED_WILDCARD = re.compile(r"\.\{(\d+,?\d*)\}")
+
+
+@lru_cache(maxsize=4096)
+def _reasoning_pattern(pattern: str) -> re.Pattern:
+    # A wildcard may not swallow a denial or jump past "because" to a new cause.
+    # Other clause boundaries stay allowed: "aluminium is a metal, but it is not
+    # magnetic" is a valid authored negative spanning both clauses.
+    # Explicitly authored negatives still match: e.g. "mass ... doesn't change"
+    # and "not ... reliable". Simply discarding every negative would reject them.
+    guarded = _BOUNDED_WILDCARD.sub(
+        lambda m: r"(?:(?!" + _REASONING_DENIAL + r"|\bbecause\b).){" + m.group(1) + "}", pattern
+    )
+    return _compile(guarded)
+
+
+def matches_reasoning(patterns: list[str], text: str, blocked: list[tuple[int, int]]) -> bool:
+    """Find asserted reasoning outside misconception spans; this is a bounded rule,
+    not a general-purpose negation or contradiction parser."""
+    for pattern in patterns:
+        for match in _reasoning_pattern(pattern).finditer(text):
+            if _DENIED_PREFIX.search(text[:match.start()]):
+                continue
+            if all(match.end() <= start or match.start() >= end for start, end in blocked):
+                return True
+    return False
 
 
 # Only explicit denials: "wool doesn't make heat", "not because the sun melts it". A bare "no" is the

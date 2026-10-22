@@ -219,7 +219,8 @@ def to_markdown(rep: dict) -> str:
         "",
         "## Development vs held-out split",
         "",
-        "Rules were improved by inspecting **dev** errors only; **test** cases (every 3rd id) were never inspected.",
+        "This revision uses authored examples, independent regressions and **dev** errors; **test** case contents (every 3rd id) are not used to tune rules. "
+        "Historical caveat: an earlier safety change was informed by one held-out case, so the safety catch rate is optimistic.",
         "",
         "| Split | Cases | Classification acc. | Safety catch | Curio false mastery | Baseline false mastery |",
         "|---|---|---|---|---|---|",

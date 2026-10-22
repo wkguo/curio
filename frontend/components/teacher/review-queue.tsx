@@ -5,8 +5,8 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Emoji } from "@/components/ui/emoji";
-import { api } from "@/lib/api";
-import { useQueue } from "@/lib/hooks";
+import { api, CurioError, FRIENDLY_ERROR } from "@/lib/api";
+import { useOffline, useQueue } from "@/lib/hooks";
 import { SAFETY_LABEL } from "@/lib/labels";
 import { cn, timeAgo } from "@/lib/utils";
 import type { ReviewItem } from "@/types/api";
@@ -21,16 +21,21 @@ const KIND: Record<ReviewItem["kind"], { label: string; icon: typeof Check; tone
 /** Cases the AI deliberately does not handle alone (proposal: defer to teacher review). */
 export function ReviewQueue({ limit }: { limit?: number }) {
   const { data, mutate } = useQueue();
+  const offline = useOffline();
   const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   if (!data) return <div className="h-24 animate-pulse rounded-2xl bg-ink-100" />;
   if (data.length === 0)
     return (
       <div className="flex items-center gap-3 rounded-2xl bg-mint-50 p-4 text-sm font-bold text-mint-700">
-        <Emoji name="check_mark_button" size={24} /> Nothing needs your attention right now.
+        <Emoji name="check_mark_button" size={24} /> {offline ? "No queued items in this recorded example. Connect to see the current queue." : "Nothing needs your attention right now."}
       </div>
     );
   return (
-    <ul className="space-y-2">
+    <div className="space-y-2">
+      {offline && <p role="status" className="text-xs font-bold text-sun-700">Recorded queue. Connect to the live app to resolve items.</p>}
+      {error && <p role="alert" className="text-sm font-bold text-coral-600">{error}</p>}
+      <ul className="space-y-2">
       {data.slice(0, limit ?? data.length).map((it) => {
         const k = KIND[it.kind];
         const Icon = k.icon;
@@ -55,12 +60,18 @@ export function ReviewQueue({ limit }: { limit?: number }) {
             <Button
               size="sm"
               variant="secondary"
-              disabled={busy === it.id}
+              disabled={busy !== null || offline}
               onClick={async () => {
                 setBusy(it.id);
-                await api.resolveQueue(it.id, "Followed up with student");
-                await mutate();
-                setBusy(null);
+                setError(null);
+                try {
+                  await api.resolveQueue(it.id, "Followed up with student");
+                  await mutate();
+                } catch (e) {
+                  setError(e instanceof CurioError ? e.message : FRIENDLY_ERROR);
+                } finally {
+                  setBusy(null);
+                }
               }}
             >
               <Check /> Resolve
@@ -68,6 +79,7 @@ export function ReviewQueue({ limit }: { limit?: number }) {
           </li>
         );
       })}
-    </ul>
+      </ul>
+    </div>
   );
 }

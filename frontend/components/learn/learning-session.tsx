@@ -23,7 +23,7 @@ import { Confetti } from "@/components/ui/confetti";
 import { Emoji } from "@/components/ui/emoji";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api, CurioError, FRIENDLY_ERROR } from "@/lib/api";
-import { useStudents, useTopic } from "@/lib/hooks";
+import { useOffline, useStudents, useTopic } from "@/lib/hooks";
 import { useStudent } from "@/lib/student-context";
 import { cn, sleep } from "@/lib/utils";
 import type {
@@ -65,8 +65,10 @@ export function LearningSession({ topicId, onExit }: { topicId: string; onExit: 
   const avatar = students?.find((s) => s.id === studentId)?.avatar ?? "fox";
   const isDemo = students?.find((s) => s.id === studentId)?.is_demo ?? true;
   const { data: topic } = useTopic(topicId);
+  const offline = useOffline();
 
   const [session, setSession] = useState<Session | null>(null);
+  const [sessionError, setSessionError] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
   const [items, setItems] = useState<Item[]>([]);
   const [phase, setPhase] = useState<Phase>("answer");
@@ -94,11 +96,24 @@ export function LearningSession({ topicId, onExit }: { topicId: string; onExit: 
     };
   }, []);
 
+  const loadSession = useCallback(async () => {
+    setSessionError(null);
+    try {
+      const loaded = await api.startSession(studentId, topicId, 5);
+      if (alive.current) {
+        if (!loaded.questions.length) setSessionError("There are no questions available for this topic yet.");
+        else setSession(loaded);
+      }
+    } catch (e) {
+      if (alive.current) setSessionError(e instanceof CurioError ? e.message : FRIENDLY_ERROR);
+    }
+  }, [studentId, topicId]);
+
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    api.startSession(studentId, topicId, 5).then(setSession).catch(() => setSession(null));
-  }, [studentId, topicId]);
+    void loadSession();
+  }, [loadSession]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -298,6 +313,20 @@ export function LearningSession({ topicId, onExit }: { topicId: string; onExit: 
   };
 
   // ---------------------------------------------------------------- render
+  if (sessionError) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-8">
+        <div role="alert" className="card-base p-6">
+          <h1 className="text-xl font-black text-ink-900">Let's try that again</h1>
+          <p className="my-4 font-semibold text-ink-600">{sessionError}</p>
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={() => void loadSession()}>Try again</Button>
+            <Button variant="secondary" onClick={onExit}>Back to topics</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!session || !q) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
@@ -319,6 +348,11 @@ export function LearningSession({ topicId, onExit }: { topicId: string; onExit: 
   return (
     <div className="mx-auto grid max-w-[1320px] gap-6 px-4 py-6 sm:px-8 xl:grid-cols-[minmax(0,1fr)_340px]">
       <div className="min-w-0">
+        {offline && (
+          <p role="status" className="mb-4 rounded-2xl border border-sun-200 bg-sun-50 p-4 text-sm font-bold text-sun-700">
+            You're exploring a recorded example. Replies and scores follow Alex's saved answers; they do not grade what you type.
+          </p>
+        )}
         {/* Header */}
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">

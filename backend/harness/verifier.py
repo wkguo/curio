@@ -8,7 +8,7 @@ path so that a curated, known misconception is never silently dropped.
 import re
 
 from harness.context import GradingKey, topic_misconceptions
-from harness.text import _compile, claim_around, matches, matches_outside, negated
+from harness.text import _compile, claim_around, matches, matches_reasoning, negated
 from schemas.curriculum import Topic
 from schemas.enums import MisconceptionType
 from schemas.harness import CurriculumContext, DetectedMisconception, Mode, ParsedProblem, ReferenceSolution, Verification
@@ -64,7 +64,7 @@ def verify_rules(parsed: ParsedProblem, key: GradingKey, topic: Topic) -> Verifi
     # Text that expresses a misconception can never also count as correct reasoning
     # ("it needs a force to keep moving" must not earn the "keeps moving" point).
     blocked = [x.span() for xs in found.values() for x in xs]
-    hits = [p.id for p in key.reasoning if matches_outside(p.patterns, text, blocked)]
+    hits = [p.id for p in key.reasoning if matches_reasoning(p.patterns, text, blocked)]
     missed = [p.id for p in key.reasoning if p.id not in hits]
     required_missed = [pid for pid in key.required_points if pid not in hits]
 
@@ -141,17 +141,20 @@ def verify_rules(parsed: ParsedProblem, key: GradingKey, topic: Topic) -> Verifi
 
 
 def _reconcile(llm_v: Verification, rule_v: Verification, key: GradingKey, on_topic: bool) -> Verification:
-    valid = {p.id for p in key.reasoning}
-    llm_v.reasoning_points_hit = [p for p in llm_v.reasoning_points_hit if p in valid]
+    valid = [p.id for p in key.reasoning]
+    llm_v.reasoning_points_hit = [p for p in valid if p in llm_v.reasoning_points_hit]
     llm_v.reasoning_points_missed = [p for p in valid if p not in llm_v.reasoning_points_hit]
+    required_missed = [p for p in key.required_points if p not in llm_v.reasoning_points_hit]
     known = {m.id for m in llm_v.misconceptions if m.id}
     for m in rule_v.misconceptions:
         if m.id not in known:
             llm_v.misconceptions.append(m)
-    if llm_v.misconceptions:
+    if required_missed or llm_v.misconceptions or llm_v.is_guess:
         llm_v.reasoning_correct = False
+        if required_missed:
+            llm_v.reasoning_summary = "Reasoning not yet verified; missing evidence for: " + "; ".join(key.point_text[p] for p in required_missed)
         if llm_v.quality == "correct":
-            llm_v.quality = "partially_correct"
+            llm_v.quality = "partially_correct" if llm_v.answer_correct or llm_v.reasoning_points_hit else "incorrect"
     llm_classification = llm_v.classification
     llm_v.classification = derive_classification(llm_v, on_topic)
     if llm_classification == "unclear" and llm_v.classification in ("incorrect", "incomplete") and not llm_v.reasoning_points_hit:

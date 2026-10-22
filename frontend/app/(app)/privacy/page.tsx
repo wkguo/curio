@@ -8,8 +8,8 @@ import { CurioSays } from "@/components/mascot/curio";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Emoji } from "@/components/ui/emoji";
-import { api } from "@/lib/api";
-import { usePrivacy } from "@/lib/hooks";
+import { api, CurioError, FRIENDLY_ERROR } from "@/lib/api";
+import { useOffline, usePrivacy } from "@/lib/hooks";
 import { useStudent } from "@/lib/student-context";
 
 const LABEL: Record<string, string> = {
@@ -22,21 +22,45 @@ const LABEL: Record<string, string> = {
 
 export default function PrivacyPage() {
   const { data, mutate } = usePrivacy();
+  const offline = useOffline();
   const { studentId, refreshAll, resetDemo } = useStudent();
   const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const runAction = async (action: () => Promise<unknown>, success: string) => {
+    setBusy(true);
+    setError(null);
+    setMessage(null);
+    try {
+      await action();
+      setConfirm(false);
+      await mutate();
+      refreshAll();
+      setMessage(success);
+    } catch (e) {
+      setError(e instanceof CurioError ? e.message : FRIENDLY_ERROR);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-8 sm:py-8">
       <PageHeader
         eyebrow="Privacy & safety"
         title="Your data, kept small and safe"
-        subtitle="Curio follows the PDPC Advisory Guidelines on children's personal data: collect as little as possible, protect it, and let families remove it."
+        subtitle="See what Curio stores, how common personal details are masked, and how to remove learning records."
       />
       <div className="mt-6">
         <CurioSays mood="happy">
-          I only remember what helps you learn science. Never share your phone number, address or IC with me — if you do, I hide it before saving! 🔒
+          Please keep your name, phone number, address and IC out of your answers. I can hide common contact details, but I might miss something. 🔒
         </CurioSays>
       </div>
+      {offline && <p role="status" className="mt-4 rounded-2xl bg-sun-50 p-3 text-sm font-bold text-sun-700">These are recorded demo records. Connect to the live app to view or delete current learning data.</p>}
+      {error && <p role="alert" className="mt-4 text-sm font-bold text-coral-600">{error}</p>}
+      {message && <p role="status" className="mt-4 text-sm font-bold text-mint-700">{message}</p>}
 
       <div className="mt-6 grid gap-5 md:grid-cols-2">
         <Card className="p-6">
@@ -79,7 +103,7 @@ export default function PrivacyPage() {
         </div>
         <div className="mt-5 flex flex-wrap items-center gap-3">
           {!confirm ? (
-            <Button variant="secondary" onClick={() => setConfirm(true)}>
+            <Button variant="secondary" disabled={busy || offline || !data} onClick={() => setConfirm(true)}>
               <Trash2 /> Delete my learning data
             </Button>
           ) : (
@@ -87,22 +111,18 @@ export default function PrivacyPage() {
               <span className="text-sm font-bold text-coral-600">This removes all answers, traces and mastery for this student. Sure?</span>
               <Button
                 variant="coral"
-                onClick={async () => {
-                  await api.deleteData(studentId);
-                  setConfirm(false);
-                  await mutate();
-                  refreshAll();
-                }}
+                disabled={busy || offline}
+                onClick={() => void runAction(() => api.deleteData(studentId), "Your learning records were deleted.")}
               >
-                Yes, delete
+                {busy ? "Deleting…" : "Yes, delete"}
               </Button>
-              <Button variant="ghost" onClick={() => setConfirm(false)}>
+              <Button variant="ghost" disabled={busy} onClick={() => setConfirm(false)}>
                 Cancel
               </Button>
             </>
           )}
-          <Button variant="ghost" onClick={() => resetDemo().then(() => mutate())}>
-            Restore demo data
+          <Button variant="ghost" disabled={busy} onClick={() => void runAction(resetDemo, offline ? "Recorded demo restarted." : "Demo data restored.")}>
+            {offline ? "Restart recorded demo" : "Restore demo data"}
           </Button>
         </div>
       </Card>
@@ -111,7 +131,7 @@ export default function PrivacyPage() {
         <h2 className="mb-3 text-lg font-black text-ink-900">How Curio keeps conversations safe</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {[
-            ["shield", "Personal details are hidden automatically before anything is saved or sent to an AI model."],
+            ["shield", "Common phone, email and IC formats are hidden before saving or sending to a model. Names and unfamiliar address formats may be missed."],
             ["teacher", "If a message sounds like someone is upset or unsafe, Curio stops, shares helplines and alerts the teacher."],
             ["books", "Curio only talks about the science question — off-topic chat and tricks to change its rules are redirected."],
             ["magnifying_glass", "When Curio can't tell what you mean, it asks you — or asks your teacher — instead of guessing."],

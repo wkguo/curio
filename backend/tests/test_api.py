@@ -36,3 +36,21 @@ def test_harness_crash_returns_safe_message(client, monkeypatch):
     body = r.json()
     assert body["code"] == "curio_unavailable"
     assert "secret" not in r.text and "Traceback" not in r.text
+
+
+def test_llm_comparison_endpoint_exposes_only_aggregate_metrics(client, monkeypatch, tmp_path):
+    import json
+    from api import evaluation
+
+    monkeypatch.setattr(evaluation, "REPORTS", tmp_path)
+    assert client.get("/api/evaluation/llm-baseline").json()["available"] is False
+    (tmp_path / "llm_only.json").write_text(json.dumps({
+        "model": "test-model", "cases": 1,
+        "llm_only_cases": [{"answer": "do not publish this case", "gold": "private"}],
+        "systems": {"llm_only": {"label": "LLM only", "calls": 2, "metrics": {"all": {"n": 1}, "test": {"n": 1}}}},
+    }))
+    r = client.get("/api/evaluation/llm-baseline")
+    assert r.status_code == 200
+    assert r.json()["available"] is True
+    assert "llm_only_cases" not in r.json()
+    assert "do not publish" not in r.text and "private" not in r.text

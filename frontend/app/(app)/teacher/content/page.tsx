@@ -11,8 +11,8 @@ import { Emoji } from "@/components/ui/emoji";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { api } from "@/lib/api";
-import { usePathways, useTopics } from "@/lib/hooks";
+import { api, CurioError, FRIENDLY_ERROR } from "@/lib/api";
+import { useOffline, usePathways, useTopics } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import type { Pathway } from "@/types/api";
 
@@ -26,6 +26,7 @@ export default function ContentReviewPage() {
   const { data: topics } = useTopics();
   const [topicId, setTopicId] = useState("heat_transfer");
   const { data, mutate } = usePathways();
+  const offline = useOffline();
   const shown = data?.filter((p) => p.topic_id === topicId);
   const counts = { draft: 0, approved: 0, flagged: 0 };
   data?.forEach((p) => (counts[p.review_status] += 1));
@@ -37,6 +38,7 @@ export default function ContentReviewPage() {
         title="Concept pathway review"
         subtitle="Every pathway the AI uses — learning objective, expected explanation, misconceptions, diagnostic question, follow-up questions and mastery criterion — for a teacher to approve before use."
       />
+      {offline && <p role="status" className="mt-4 rounded-2xl bg-sun-50 p-3 text-sm font-bold text-sun-700">Recorded content review. Connect to the live app to save approvals or changes.</p>}
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <div className="flex gap-2">
           {(Object.keys(STATUS) as (keyof typeof STATUS)[]).map((k) => (
@@ -60,21 +62,28 @@ export default function ContentReviewPage() {
       </div>
       <div className="mt-5 space-y-3">
         {!shown && [0, 1, 2].map((i) => <Skeleton key={i} className="h-20" />)}
-        {shown?.map((p) => <PathwayCard key={p.id} p={p} onSaved={() => mutate()} />)}
+        {shown?.map((p) => <PathwayCard key={p.id} p={p} offline={offline} onSaved={() => mutate()} />)}
       </div>
     </div>
   );
 }
 
-function PathwayCard({ p, onSaved }: { p: Pathway; onSaved: () => void }) {
+function PathwayCard({ p, offline, onSaved }: { p: Pathway; offline: boolean; onSaved: () => Promise<unknown> }) {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState(p.review_note);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const save = async (status: Pathway["review_status"]) => {
     setBusy(true);
-    await api.reviewPathway(p.id, status, "Class teacher", note);
-    setBusy(false);
-    onSaved();
+    setError(null);
+    try {
+      await api.reviewPathway(p.id, status, "Class teacher", note);
+      await onSaved();
+    } catch (e) {
+      setError(e instanceof CurioError ? e.message : FRIENDLY_ERROR);
+    } finally {
+      setBusy(false);
+    }
   };
   return (
     <Card className="overflow-hidden">
@@ -130,14 +139,15 @@ function PathwayCard({ p, onSaved }: { p: Pathway; onSaved: () => void }) {
               <div className="md:col-span-2">
                 <div className="label-caps mb-1">Review note</div>
                 <Textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. accept “steam” as well as “water vapour”" />
+                {error && <p role="alert" className="mt-3 text-sm font-bold text-coral-600">{error}</p>}
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <Button size="sm" variant="mint" disabled={busy} onClick={() => save("approved")}>
+                  <Button size="sm" variant="mint" disabled={busy || offline} onClick={() => save("approved")}>
                     <Check /> Approve
                   </Button>
-                  <Button size="sm" variant="coral" disabled={busy} onClick={() => save("flagged")}>
+                  <Button size="sm" variant="coral" disabled={busy || offline} onClick={() => save("flagged")}>
                     <Flag /> Flag for changes
                   </Button>
-                  <Button size="sm" variant="ghost" disabled={busy} onClick={() => save("draft")}>
+                  <Button size="sm" variant="ghost" disabled={busy || offline} onClick={() => save("draft")}>
                     Reset to draft
                   </Button>
                   {p.reviewer && (

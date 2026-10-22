@@ -1,5 +1,6 @@
 # Curio — common commands. Requires: uv (Python 3.11+), Node 20+ / npm.
 .PHONY: setup dev backend frontend test check seed fixtures build eval eval-llm-baseline video video-short
+NODE ?= $(if $(CURIO_NODE_BIN),$(CURIO_NODE_BIN),node)
 
 setup:            ## install backend + frontend dependencies
 	cd backend && uv sync --group dev
@@ -12,12 +13,12 @@ backend:          ## FastAPI with reload
 	cd backend && uv run uvicorn main:app --reload --port $${CURIO_API_PORT:-8000}
 
 frontend:         ## Next.js dev server
-	cd frontend && npm run dev
+	cd frontend && "$(NODE)" node_modules/next/dist/bin/next dev -p $${CURIO_WEB_PORT:-3000}
 
 test:             ## backend tests + curriculum lint + frontend typecheck
 	cd backend && uv run pytest -q
 	cd backend && uv run python scripts/check_curriculum.py
-	cd frontend && npx tsc --noEmit
+	cd frontend && "$(NODE)" node_modules/typescript/bin/tsc --noEmit
 
 check: test       ## alias
 
@@ -34,7 +35,7 @@ fixtures:         ## regenerate offline-demo fixtures from the real backend
 	cd backend && uv run python scripts/export_fixtures.py
 
 build:            ## production build of the frontend
-	cd frontend && npm run build
+	cd frontend && "$(NODE)" node_modules/next/dist/bin/next build
 
 video:            ## record docs/demo/curio_demo.mp4 (needs backend :8000 + frontend :3000 running, ffmpeg)
 	cd backend && uv run python -m database.seed --force

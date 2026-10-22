@@ -40,6 +40,9 @@ class LLMClient:
     async def generate(self, messages: list[dict[str, str]], schema: type[T] | None = None) -> T | str:
         raise NotImplementedError
 
+    async def aclose(self) -> None:
+        """Release transport resources when a standalone evaluation ends."""
+
 
 class DisabledLLMClient(LLMClient):
     name = "disabled"
@@ -78,6 +81,9 @@ class OpenAICompatibleClient(LLMClient):
     def available(self) -> bool:
         return True
 
+    async def aclose(self) -> None:
+        await self._client.aclose()
+
     async def _chat(self, messages: list[dict[str, str]], json_mode: bool) -> str:
         body: dict[str, Any] = {
             "model": self.settings.llm_model,
@@ -99,10 +105,12 @@ class OpenAICompatibleClient(LLMClient):
             return await self._chat(messages, json_mode=False)
 
         schema_hint = json.dumps(schema.model_json_schema(), ensure_ascii=False)
-        convo = [
-            *messages,
-            {"role": "system", "content": f"Respond with ONE JSON object matching this JSON schema:\n{schema_hint}"},
-        ]
+        hint = f"Respond with ONE JSON object matching this JSON schema:\n{schema_hint}"
+        convo = [dict(m) for m in messages]
+        if convo and convo[0]["role"] == "system":
+            convo[0]["content"] += "\n\n" + hint
+        else:
+            convo.insert(0, {"role": "system", "content": hint})
         last_error: Exception | None = None
         for attempt in range(2):  # spec §25: retry once
             raw = await self._chat(convo, json_mode=True)

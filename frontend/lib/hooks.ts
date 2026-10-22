@@ -66,3 +66,7 @@ export function usePrivacy() {
 export function useEvaluation() {
   return useSWR("evaluation", api.evaluation, { revalidateOnFocus: false });
 }
+
+export function useLLMComparison() {
+  return useSWR("llm-comparison", api.llmComparison, { revalidateOnFocus: false });
+}

@@ -39,7 +39,9 @@ make dev        # backend :8000 + frontend :3000
 Open **http://localhost:3000**. The API docs are at http://localhost:8000/docs.
 
 - **No API key needed.** Without an LLM key, the harness runs on the curated curriculum rules. This mode is deterministic and demo-safe.
-- **No backend needed.** If the backend is unreachable, the frontend switches to *Offline demo* mode. It then replays fixtures that were exported from the real backend (`make fixtures`). A backend-free static demo also works: `NEXT_PUBLIC_CURIO_OFFLINE=1 npm run build`.
+- **No backend needed.** If the backend is unreachable, the frontend switches to *Recorded demo* mode and replays fixtures exported from the backend (`make fixtures`). Recorded scores do not grade what you type; deletion, benchmark execution and teacher review changes need the live app. A backend-free static demo also works: `NEXT_PUBLIC_CURIO_OFFLINE=1 make build`.
+
+For isolated local testing, use `CURIO_API_PORT=8765 CURIO_WEB_PORT=3765 CURIO_HARNESS_MODE=rules make dev`. Both ports are checked before starting. If Node is installed outside `PATH`, set `CURIO_NODE_BIN` to its executable; `make test`, `make build` and `make dev` use it without requiring an `npx` wrapper.
 
 ### Connect an LLM (optional)
 
@@ -54,6 +56,9 @@ cp backend/.env.example backend/.env
 - `llm`: try the LLM first.
 
 Whatever the mode, every step falls back to the deterministic rules when a model call fails.
+Generated questions whose model review fails are replaced with an authored question. Model grading must identify all required reasoning points before it can confirm understanding.
+
+The same-model comparison appears in **Teacher view → Evaluation** after `make eval-llm-baseline` completes. It shows the rules harness, a single-prompt LLM and Curio with that same LLM, with held-out and overall metrics. These results are specific to the tested model and draft labels; the harness is not assumed to improve classification accuracy. A smoke run (`cd backend && uv run python -m evaluation.llm_only --with-curio-llm --limit 24`) writes separate report files. Keep `CURIO_HARNESS_MODE=rules` for the demo even when benchmark credentials are configured.
 
 ---
 
@@ -128,6 +133,7 @@ Architecture and design decisions: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 | `GET` · `DELETE` | `/api/privacy/students/{id}` | What is stored for a student / delete it |
 | `POST` | `/api/privacy/purge` | Delete records older than `CURIO_RETENTION_DAYS` |
 | `GET` · `POST` | `/api/evaluation/report` · `/api/evaluation/run` | Latest benchmark report / re-run it |
+| `GET` | `/api/evaluation/llm-baseline` | Completed same-model comparison aggregates (no individual benchmark answers) |
 | `POST` | `/api/demo/reset` | One-click demo reset |
 
 Harness failures return `503 {"code": "curio_unavailable", "message": "Curio is having trouble checking that answer right now…"}`. The API never returns stack traces, raw prompts or parse errors.
@@ -174,13 +180,21 @@ gp8000/
 ## Verification
 
 ```bash
-make test   # pytest (85 tests) + curriculum linter + TypeScript typecheck
+make test   # pytest (131 tests) + curriculum linter + TypeScript typecheck
 make eval   # benchmark → backend/evaluation/reports/latest.{json,md}
 make eval-llm-baseline  # one-prompt LLM vs Curio (same model, same cases) → reports/llm_only.{json,md}
 make build  # production build of the frontend
 ```
 
 The tests pin the scripted demo numbers (0.52 → 0.56 → 0.76), and they check every proposal control: safety categories, redaction before storage, clarify-or-defer, the reteach loop and its state transitions, mastery gating, review-required mode, privacy deletion, and Curio beating the answer-only baseline. They also check that grading keys never reach the client, that a harness crash returns the safe message, that the LLM path reconciles with curated misconceptions and falls back cleanly, that the dialogue is bounded, and that misconception text can never earn reasoning credit.
+
+Browser regressions are in `scripts/check_ui.py` (requires Playwright and its Chromium). Run it against an isolated test app with a temporary database:
+
+```bash
+python scripts/check_ui.py --base-url http://127.0.0.1:3765 --artifacts-dir /tmp/curio-ui-check
+```
+
+It checks mobile layouts, session retry, evaluation error recovery and recorded-demo controls. Comparison-table layout uses an explicitly synthetic UI fixture; it is not an experiment result.
 
 ## Credits
 

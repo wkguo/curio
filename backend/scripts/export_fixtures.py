@@ -46,6 +46,7 @@ def main() -> None:
         fx["pathways"] = get("/api/teacher/pathways")
         fx["privacy"] = get(f"/api/privacy/students/{SID}")
         fx["evaluation"] = c.post("/api/evaluation/run?mode=rules").json()
+        fx["llm_comparison"] = get("/api/evaluation/llm-baseline")
 
         # One scripted flow per question: misconception → dialogue → transfer.
         for topic_id, sess in fx["sessions"].items():

@@ -98,7 +98,9 @@ async def generate_transfer_question(
                 cand = await _generate_once(llm, question, d, ctx, snapshot)
             except LLMError:
                 break
-            quality, _ = await verify_question(llm, cand, key, ctx, topic)
+            quality, review_mode = await verify_question(llm, cand, key, ctx, topic)
+            if review_mode == "fallback":
+                break
             if quality.approved:
                 return cand, quality, "llm", attempt
     if authored is None:  # a pack without authored transfer questions: reuse the concept summary

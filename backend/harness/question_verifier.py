@@ -68,8 +68,13 @@ async def verify_question(
             candidate=candidate.model_dump_json(include={"prompt", "expected_answer", "expected_reasoning"}),
         )
         judged = await llm.generate(system_user(prompt), schema=QuestionQuality)
-        judged.approved = judged.approved and q.approved and judged.difficulty != "harder"
+        judged.approved = all([
+            judged.approved, q.approved, judged.same_concept, judged.age_appropriate,
+            judged.answerable, judged.curriculum_aligned, judged.not_a_repeat, judged.difficulty != "harder",
+        ])
         judged.notes = [*q.notes, *judged.notes][:6]
         return judged, "llm"
     except LLMError:
+        q.approved = False
+        q.notes.append("model review unavailable; use an authored question")
         return q, "fallback"

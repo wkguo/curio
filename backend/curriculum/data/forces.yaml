@@ -433,10 +433,12 @@ questions:
       - id: gravity_same_rate
         point: Gravity makes objects fall at the same rate regardless of how heavy they are (when air resistance is small).
         patterns:
-          - "gravity"
+          - "gravity.{0,65}(same|equal) (rate|speed)"
+          - "(same|equal) (rate|speed).{0,30}(due to|under) gravity"
           - "(weight|mass|heav).{0,40}(does not|doesn't|not) (matter|change|make)"
-          - "air resistance"
-    required_points: [same_time]
+          - "air resistance.{0,20}(small|tiny|negligible|little)"
+          - "(small|tiny|negligible|little).{0,15}air resistance"
+    required_points: [same_time, gravity_same_rate]
     misconceptions: [heavier_falls_faster]
     hints:
       - Gravity pulls on both balls. Does being heavier really make a ball fall faster?
@@ -447,7 +449,7 @@ questions:
       correct: Both balls land at about the same time. Gravity pulls both down and they fall at the same rate, even though one is heavier.
     transfer_questions:
       - id: forces_002_t1
-        prompt: At the playground, Siti holds a basketball and a tennis ball at the top of the slide and lets go of both at the same time. Which reaches the ground first?
+        prompt: At the playground, Siti holds a basketball and a tennis ball at the top of the slide and lets go of both at the same time. Which reaches the ground first? Explain.
         emoji: basketball
         answer_patterns: ["same time", "together", "both"]
         expected_answer: They reach the ground at about the same time, because gravity makes them fall at the same rate.
@@ -458,7 +460,15 @@ questions:
               - "same time"
               - "(land|lands|reach|reaches|hit|hits).{0,20}together"
               - "(same|equal) (speed|rate)"
-        required_points: [same_time]
+          - id: gravity_same_rate
+            point: Gravity makes the balls fall at the same rate when air resistance is small.
+            patterns:
+              - "gravity.{0,65}(same|equal) (rate|speed)"
+              - "(same|equal) (rate|speed).{0,30}(due to|under) gravity"
+              - "(weight|mass|heav).{0,40}(does not|doesn't|not) (matter|change|make)"
+              - "air resistance.{0,20}(small|tiny|negligible|little)"
+              - "(small|tiny|negligible|little).{0,15}air resistance"
+        required_points: [same_time, gravity_same_rate]
         demo_answer: They reach the ground at the same time because gravity makes them fall at the same rate.
 
       - id: forces_002_t2
@@ -473,7 +483,15 @@ questions:
               - "same time"
               - "(land|lands|reach|reaches|hit|hits).{0,20}together"
               - "(same|equal) (speed|rate)"
-        required_points: [same_time]
+          - id: gravity_same_rate
+            point: Gravity makes the stone and pebble fall at the same rate when air resistance is small.
+            patterns:
+              - "gravity.{0,65}(same|equal) (rate|speed)"
+              - "(same|equal) (rate|speed).{0,30}(due to|under) gravity"
+              - "(weight|mass|heav).{0,40}(does not|doesn't|not) (matter|change|make)"
+              - "air resistance.{0,20}(small|tiny|negligible|little)"
+              - "(small|tiny|negligible|little).{0,15}air resistance"
+        required_points: [same_time, gravity_same_rate]
         demo_answer: They hit the ground at the same time, because gravity makes them fall at the same rate even though the stone is heavier.
 
   - id: forces_003
@@ -683,14 +701,15 @@ questions:
       - id: mass_same
         point: His mass stays the same (60 kg).
         patterns:
-          - "mass.{0,30}(same|not change|doesn't change|does not change|stay|stays|unchanged|still 60)"
+          - "mass.{0,30}((stay|stays|remain|remains|is) (the )?same|not change|doesn't change|does not change|unchanged|still 60)"
       - id: weight_less
         point: His weight is less because the Moon's gravity is weaker.
         patterns:
           - "weight.{0,30}(less|lower|smaller|decrease|decreases|lighter|goes down)"
-          - "(weaker|less|smaller) gravity"
-          - "gravity.{0,30}(weaker|less|smaller)"
-    required_points: [mass_same, weight_less]
+      - id: gravity_weaker
+        point: The Moon's weaker gravity causes the lower weight.
+        patterns: ["(weaker|less|smaller) gravity", "gravity.{0,30}(weaker|less|smaller)"]
+    required_points: [mass_same, weight_less, gravity_weaker]
     misconceptions: [mass_changes_with_gravity]
     hints:
       - Does the astronaut lose any part of his body on the way to the Moon?
@@ -709,14 +728,15 @@ questions:
           - id: mass_same
             point: The rock's mass stays the same (2 kg).
             patterns:
-              - "mass.{0,30}(same|not change|doesn't change|does not change|stay|stays|unchanged|still 2)"
+              - "mass.{0,30}((stay|stays|remain|remains|is) (the )?same|not change|doesn't change|does not change|unchanged|still 2)"
           - id: weight_more
             point: Its weight is greater on Earth because Earth's gravity is stronger.
             patterns:
               - "weight.{0,30}(more|greater|bigger|heavier|increase|increases)"
-              - "(stronger|more|greater) gravity"
-              - "gravity.{0,30}(stronger|greater|more)"
-        required_points: [mass_same, weight_more]
+          - id: gravity_stronger
+            point: Earth's stronger gravity causes the greater weight.
+            patterns: ["(stronger|more|greater) gravity", "gravity.{0,30}(stronger|greater|more)"]
+        required_points: [mass_same, weight_more, gravity_stronger]
         demo_answer: The mass of the rock stays the same at 2 kg, but its weight is greater on Earth because Earth's gravity is stronger.
 
       - id: forces_006_t2
@@ -728,14 +748,15 @@ questions:
           - id: mass_same
             point: The rover's mass stays the same (900 kg).
             patterns:
-              - "mass.{0,30}(same|not change|doesn't change|does not change|stay|stays|unchanged|still 900)"
+              - "mass.{0,30}((stay|stays|remain|remains|is) (the )?same|not change|doesn't change|does not change|unchanged|still 900)"
           - id: weight_less
             point: Its weight is less because gravity on Mars is weaker.
             patterns:
               - "weight.{0,30}(less|lower|smaller|decrease|decreases|lighter|goes down)"
-              - "(weaker|less|smaller) gravity"
-              - "gravity.{0,30}(weaker|less|smaller)"
-        required_points: [mass_same, weight_less]
+          - id: gravity_weaker
+            point: Mars's weaker gravity causes the lower weight.
+            patterns: ["(weaker|less|smaller) gravity", "gravity.{0,30}(weaker|less|smaller)"]
+        required_points: [mass_same, weight_less, gravity_weaker]
         demo_answer: Its mass stays the same at 900 kg, but its weight is less because the gravity on Mars is weaker.
 
   - id: forces_007

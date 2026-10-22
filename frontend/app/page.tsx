@@ -75,7 +75,7 @@ export default function Landing() {
               </span>
             </h1>
             <p className="mt-7 max-w-xl text-lg font-semibold leading-relaxed text-ink-600">
-              Curio doesn&apos;t simply check whether students get the right answer. It verifies whether they understand <b className="text-ink-900">why</b> — finds the misconception, teaches the missing idea, then asks a brand-new question to confirm it stuck.
+              Curio checks answers and explanations, names known misconceptions, offers a short teaching step and asks a transfer question. See the evidence behind each decision.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="xl">
@@ -89,10 +89,10 @@ export default function Landing() {
             </div>
             <div className="mt-8 flex items-center gap-5 text-sm font-bold text-ink-500">
               <span className="flex items-center gap-1.5">
-                <Emoji name="books" size={22} /> 24 concept pathways
+                <Emoji name="books" size={22} /> 24 draft pathways
               </span>
               <span className="flex items-center gap-1.5">
-                <Emoji name="teacher" size={22} /> Teacher-grade traces
+                <Emoji name="teacher" size={22} /> Traces for teacher review
               </span>
             </div>
           </motion.div>
@@ -105,28 +105,28 @@ export default function Landing() {
       <section className="mx-auto max-w-6xl px-5 py-20">
         <div className="mx-auto max-w-2xl text-center">
           <div className="label-caps">Why Curio is different</div>
-          <h2 className="mt-2 text-4xl font-black text-ink-900">Understanding &gt; answer accuracy</h2>
-          <p className="mt-3 text-[17px] font-semibold text-ink-500">A correct final answer does not automatically mean mastery. Curio is built around that one idea.</p>
+          <h2 className="mt-2 text-4xl font-black text-ink-900">A learning workflow you can inspect</h2>
+          <p className="mt-3 text-[17px] font-semibold text-ink-500">See the reasoning check, teaching step and transfer attempt behind each mastery update.</p>
         </div>
         <div className="mt-12 grid gap-6 md:grid-cols-[1fr_1.4fr]">
           <div className="card-base p-7 opacity-90">
             <div className="flex items-center gap-2 text-lg font-black text-ink-500">
-              <MessageSquareOff className="h-5 w-5" /> A normal chatbot
+              <MessageSquareOff className="h-5 w-5" /> A single-prompt tutor
             </div>
             <div className="mt-8 flex flex-col items-center gap-2">
-              {["Student question", "LLM", "Answer"].map((s, i) => (
+              {["Question + response", "One prompt", "Model judgement"].map((s, i) => (
                 <div key={s} className="flex flex-col items-center gap-2">
                   <div className="rounded-2xl bg-ink-100 px-6 py-3 font-extrabold text-ink-500">{s}</div>
                   {i < 2 && <div className="h-6 w-0.5 bg-ink-200" />}
                 </div>
               ))}
             </div>
-            <p className="mt-8 text-center text-sm font-bold text-ink-400">Gives the answer away. Never checks if the student understood.</p>
+            <p className="mt-8 text-center text-sm font-bold text-ink-500">A well-prompted model can check reasoning. Its grading accuracy needs to be measured on the same cases.</p>
           </div>
           <div className="card-base relative overflow-hidden p-7">
             <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-curio-100 blur-2xl" />
             <div className="relative flex items-center gap-2 text-lg font-black text-curio-600">
-              <Curio size={34} /> Curio&apos;s pedagogical harness
+              <Curio size={34} /> Curio&apos;s learning workflow
             </div>
             <ol className="relative mt-6 grid gap-2.5 sm:grid-cols-2">
               <li className="rounded-2xl bg-ink-900 px-4 py-3 font-extrabold text-white sm:col-span-2">Student response</li>
@@ -188,9 +188,8 @@ export default function Landing() {
             <div className="label-caps">Research question</div>
             <h2 className="mt-2 text-3xl font-black text-ink-900">Can an AI tutor verify understanding before declaring mastery?</h2>
             <p className="mt-3 text-[16px] font-semibold text-ink-500">
-              Curio is not another question bank. Every pathway is grounded in the syllabus and reviewed by a teacher. Every decision is traced. And Curio is
-              benchmarked against an answer-only grader on teacher-labelled cases of correct, poor-reasoning, incomplete, misconception, ambiguous and unsafe
-              responses.
+              The prototype has 24 draft pathways and AI-drafted benchmark labels, all awaiting teacher review. View the grading comparisons, failed cases
+              and current limits. These checks measure grading behaviour; learning outcomes have not been studied.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild>
@@ -225,15 +224,15 @@ export default function Landing() {
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div>
             <div className="label-caps">Built for 10–12 year olds</div>
-            <h2 className="mt-2 text-4xl font-black text-ink-900">Safe by design</h2>
-            <p className="mt-3 text-[17px] font-semibold text-ink-500">Curio is a focused science tutor, not an open chatbot.</p>
+            <h2 className="mt-2 text-4xl font-black text-ink-900">Safety checks at each step</h2>
+            <p className="mt-3 text-[17px] font-semibold text-ink-500">Science-focused feedback, data masking and a route to teacher review.</p>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2">
             {[
-              { i: ShieldCheck, t: "Curriculum-bounded", d: "Stays inside the syllabus; no general chat." },
-              { i: Lock, t: "Minimal data (PDPC)", d: "Personal details are auto-hidden before saving; families can delete data." },
-              { i: CheckCircle2, t: "Curated content first", d: "Teacher-authored teaching is preferred over generated text." },
-              { i: Undo2, t: "Ask or defer, never guess", d: "Unclear answers get a clarifying question — or go to the teacher." },
+              { i: ShieldCheck, t: "Science-focused", d: "Curriculum context guides feedback and follow-up questions." },
+              { i: Lock, t: "Keep personal details out", d: "Common contact formats are masked; names and unfamiliar formats may be missed." },
+              { i: CheckCircle2, t: "Curriculum scripts first", d: "Draft scripts support teaching. Teacher review is still pending." },
+              { i: Undo2, t: "Clarify or ask a teacher", d: "Answers marked unclear get a clarifying question or a flag for teacher review." },
             ].map(({ i: Icon, t, d }) => (
               <li key={t} className="card-base p-5">
                 <Icon className="h-6 w-6 text-mint-500" />

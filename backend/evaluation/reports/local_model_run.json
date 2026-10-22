@@ -1,0 +1,100 @@
+{
+  "model": "RedHatAI/Qwen3.8-27B-INT4",
+  "served_model_name": "curio-qwen27b",
+  "checkpoint_revision": "2f0fa48fea4949b56685ddfc48c05dd81c7d772b",
+  "vllm_version": "0.30.0",
+  "gpu": "NVIDIA GeForce RTX 5090",
+  "context_length": 8192,
+  "gpu_memory_utilization": 0.75,
+  "max_num_seqs": 2,
+  "enforce_eager": true,
+  "enable_thinking": false,
+  "temperature": 0.2,
+  "model_generation_config": {
+    "bos_token_id": 248044,
+    "do_sample": true,
+    "eos_token_id": [
+      248046,
+      248044
+    ],
+    "pad_token_id": 248044,
+    "temperature": 1.0,
+    "top_k": 20,
+    "top_p": 0.95,
+    "transformers_version": "5.16.1"
+  },
+  "endpoint": "http://127.0.0.1:8766/v1",
+  "offline_weights": true,
+  "paid_provider_calls": 0,
+  "mode_for_demo": "rules",
+  "full_run_started_at_utc": "2026-10-22T13:37:10.310619+00:00",
+  "revision": "c1bfa6411a7f3bf5ac91e0ea92ad64cc0389c714",
+  "working_tree": "Includes uncommitted changes; grading/evaluation source hashes below define this run.",
+  "source_sha256": {
+    "backend/curriculum/data/forces.yaml": "d001eccabc428974f45e44fedcef42575376458fc827b73b044d0a9846ee3a3d",
+    "backend/curriculum/data/heat_transfer.yaml": "89109a6bf3aacc513a034c4c8e52ca05b35c67d24a574c2e707ad1e239dfb7db",
+    "backend/curriculum/data/matter.yaml": "90211443d79ee444c517b36104647a2b0401d24326b3f8ac6f9f1f5fa3c5ded8",
+    "backend/evaluation/benchmark.yaml": "50464b5d5f2afb6eca64d58c1ba0f6a4ff86e37bb8f8ecb371a13f20711ed4c4",
+    "backend/evaluation/llm_only.py": "a3646299143752cbe12939ac1af7e8addd78539ed37825329376b8b548c3c1f3",
+    "backend/evaluation/run.py": "1732e9baa1dd6a5fb1fbad2408096c56263df26df6d51ab33930d69f632de6b9",
+    "backend/harness/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/harness/context.py": "9262ae84601e25e486d44adda86febe91ea98a2d6f9fd2cdbf3859f8bed08307",
+    "backend/harness/dialogue.py": "1c8406b89768263e1d6362c0646076d5b867fdb0a11ca8a962407ed982ff1eea",
+    "backend/harness/mastery.py": "9971fec9bf0dce06ff2132e9716c259a46be9a020ed99223f7a928f089aea71f",
+    "backend/harness/misconception.py": "59a7f052238bf73eba7516efbf6ad01a73811f0ec83dba4425953fc24c9d3bf2",
+    "backend/harness/orchestrator.py": "23458627d91a752fa93cf668ba44475a10f76dd9db827b236fb75d435f7a4120",
+    "backend/harness/problem_parser.py": "09401972448d785665313a3d0b3a49bced24a4d17e136e5b83c944cf586009f2",
+    "backend/harness/question_generator.py": "dcd5f8786d794fe15da83dd6c44196fd34e01f046b8a1cc71a09aa024e0f5554",
+    "backend/harness/question_verifier.py": "f94958049574943658d0a713c7f9b60e01b3a4208231e21954dc72aa99c5afbb",
+    "backend/harness/reference_solver.py": "898cd912ce5d8cecaf21cf51a405472cefbce457cd0277aee2484ea91cd11810",
+    "backend/harness/safety.py": "7b6a45518e3ac6bf913d6f5c55159cfbd726a6ef055b697bbfcd02995023bfa3",
+    "backend/harness/state.py": "c8bdee61ff5f517f50bf1efdaaf88f5521e64488f73ef4ef5cc9e1ee95568cb2",
+    "backend/harness/teaching_agent.py": "807397afeac7bd202f8fa99b5159adaecfa4ba7575748524f09fb7883c79bc56",
+    "backend/harness/teaching_policy.py": "51f591e2deb88a4c05e1d4d11b6d3f70abc68961eef437e35bfb52ea741b7a45",
+    "backend/harness/text.py": "fa2e49a4654e4b5595c7aebe8705c3daa6f36835af4d5f89e3519a9ba66bdfd2",
+    "backend/harness/verifier.py": "1478931ddb6aa240d826b81944728d9aa9a2b6c46e7d913336c26957b9ffb7b2",
+    "backend/prompts/_shared_constraints.txt": "c2901fdb530a5af92c9cdc93438fc8448e8f0bce09af59fd10c86e288718a10b",
+    "backend/prompts/misconception_classifier.txt": "cf38bf108f00b43ac2400457fb5af6037f11234d3f98173cd9a9b34f97b65d9d",
+    "backend/prompts/question_generator.txt": "30e37d7f7ad6a358e0f2786033333cde52d09ccae2434fd00036ec240c8c3dda",
+    "backend/prompts/question_verifier.txt": "0a7c8a79ae91363f17efe813edf0285f56f93765292f16f8971faf1a1d815577",
+    "backend/prompts/reasoning_verifier.txt": "95ac4316e6eea47cb819413765dd2f3c86758084e14a982d3ea6061f73989247",
+    "backend/prompts/reference_solver.txt": "fd7ab1d3323dc5eacf5b7430caebf959de82ce920545d0889ecabf8c21b4de8a",
+    "backend/prompts/teaching_agent.txt": "6fcfaad0d307383f4b16ea701d758437d237b6b81e3da42af5c9a1ab30e1e401",
+    "backend/prompts/transfer_feedback.txt": "13a361dc179b10f0f2658c1813709ef897ddae05d48e318572c831f0a1ade77f",
+    "backend/services/llm.py": "7854c23480758dd15fbaf39a552604d96181aafed813e7e784590a145f8b1b66"
+  },
+  "command": "CURIO_HARNESS_MODE=rules CURIO_LLM_BASE_URL=http://127.0.0.1:8766/v1 CURIO_LLM_API_KEY=<local placeholder> CURIO_LLM_MODEL=curio-qwen27b python -m evaluation.llm_only --with-curio-llm",
+  "limits": [
+    "AI-drafted labels await teacher review",
+    "Historical safety contamination: one held-out case informed an earlier rule",
+    "Quality comparison; this run does not establish latency advantage",
+    "Personal-data audit uses the same patterns as redaction; does not cover all PII"
+  ],
+  "http_successes_before_full_run": 205,
+  "http_errors_before_full_run": {
+    "400": 2
+  },
+  "call_count_note": "Report system.calls counts generate invocations. Schema-correction retries can add HTTP requests; keep these counts separate.",
+  "full_run_finished_at_utc": "2026-10-22T14:39:15.825648+00:00",
+  "tested_source_hashes_verified_after_run": true,
+  "full_run_http_status_counts": {
+    "400": 0,
+    "200": 1118
+  },
+  "full_run_generate_calls": {
+    "curio_rules": 0,
+    "curio_llm": 864,
+    "llm_only": 242
+  },
+  "full_run_ping_generate_calls": 1,
+  "full_run_http_requests_including_schema_retries": 1118,
+  "post_run_changes": {
+    "backend/evaluation/llm_only.py": {
+      "sha256": "63063d9a6231a163f3a345a0a56cb8d30400a378a721387d507d876bcb4bc4f8",
+      "reason": "Markdown wording only: disclose historical safety contamination and single-response proxy. Grading, prompts and metrics unchanged."
+    }
+  },
+  "full_run_additional_http_requests_beyond_generate": 11,
+  "own_temporary_services_stopped": true,
+  "gpu_lease_released": true
+}

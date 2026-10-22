@@ -175,6 +175,8 @@ async def llm_only_rows(llm: LLMClient, cases: list[dict], concurrency: int = 4)
             "answer": c["answer"],
             "gold": c["expected"],
             "pred": p1,
+            "repeat_error": p2["classification"] == "error",
+            "judgement_errors": int(p1["classification"] == "error") + int(p2["classification"] == "error"),
             "consistent": (not failed) and key(p1) == key(p2),
             "match": p1["classification"] == c["expected"]["classification"],
         }
@@ -213,6 +215,8 @@ def summarize(rows: list[dict], sent: list[str] | None) -> dict:
         "raw_personal_data_sent_to_provider": _pct(sum(leaked(r) for r in pii), len(pii)) if sent is not None else None,
         "decision_consistency": _pct(sum(r["consistent"] for r in rows), len(rows)),
         "errors": len(rows_all) - len(rows),
+        "repeat_errors": sum(r.get("repeat_error", False) for r in rows_all),
+        "judgement_error_rate": _pct(sum(r.get("judgement_errors", int(r["pred"]["classification"] == "error")) for r in rows_all), 2 * len(rows_all)),
         "model_step_fallback_rate": _pct(fb, used) if used else None,
         "denominators": {"not_understood": len(not_understood), "safety": len(safety), "poor_reasoning": len(poor), "answer_requests": len(asks), "pii": len(pii)},
     }
@@ -260,7 +264,8 @@ async def compare(llm: LLMClient, with_curio_llm: bool = False, limit: int | Non
 
 def check_health(rep: dict) -> None:
     """Refuse to publish a report whose model side mostly failed."""
-    bad = rep["systems"]["llm_only"]["metrics"]["all"]["errors"] / max(1, rep["cases"])
+    m = rep["systems"]["llm_only"]["metrics"]["all"]
+    bad = m["judgement_error_rate"] if m.get("judgement_error_rate") is not None else m["errors"] / max(1, rep["cases"])
     if bad > MAX_FAIL_RATE:
         raise SystemExit(f"ABORT: {bad:.0%} of the LLM-only calls failed (limit {MAX_FAIL_RATE:.0%}); not writing a report.")
     cl = rep["systems"].get("curio_llm")
@@ -293,18 +298,20 @@ def to_markdown(rep: dict) -> str:
         f"Generated {rep['generated_at']} · model `{rep['model']}` · {rep['cases']} cases · labels: {rep['labels']}",
         "",
         "The LLM-only baseline gets the same curriculum key and similar safeguards in a single prompt, but no safety layer,",
-        "no rule reconciliation and no evidence gate. Each cell: all cases · held-out test split (never used to tune the rules).",
+        "no rule reconciliation and no evidence gate. Each cell: all cases · held-out test split (historical safety caveat below).",
         "Rows the model failed to answer are excluded from every rate (see 'answered').",
+        "False mastery is a single-response proxy against draft labels, not evidence of learning gains or mastery after teaching.",
         "",
         "| Metric | " + " | ".join(s["label"] for s in sy.values()) + " |",
         "|---|" + "---|" * len(sy),
         *[f"| {LABELS[k]} | " + " | ".join(cell(s, k) for s in sy.values()) + " |" for k in LABELS],
         "| Model calls | " + " | ".join(str(s["calls"]) for s in sy.values()) + " |",
-        "| Model failures | " + " | ".join(f"{s['metrics']['all']['errors']} cases" + (f", {f(s['metrics']['all']['model_step_fallback_rate'])} steps fell back" if s["metrics"]["all"]["model_step_fallback_rate"] is not None else "") for s in sy.values()) + " |",
+        "| Model failures | " + " | ".join(f"{s['metrics']['all']['errors']} first-pass, {s['metrics']['all'].get('repeat_errors', 0)} repeat" + (f", {f(s['metrics']['all']['model_step_fallback_rate'])} steps fell back" if s["metrics"]["all"]["model_step_fallback_rate"] is not None else "") for s in sy.values()) + " |",
         "",
         f"Denominators, held-out test: not-understood {d['test']['denominators']['not_understood']}, safety {d['test']['denominators']['safety']}, "
         f"poor reasoning {d['test']['denominators']['poor_reasoning']}, answer requests {d['test']['denominators']['answer_requests']}, PII {d['test']['denominators']['pii']}. "
         "Small numbers: treat differences of a few points as noise. The give-away rows are a keyword match, not a judge.",
+        "Historical caveat: one earlier safety-rule change used a held-out example; safety catch rates are optimistic. Labels are AI-drafted, awaiting teacher review.",
     ]
     return "\n".join(lines) + "\n"
 
@@ -320,17 +327,26 @@ def main() -> None:
     if not s.llm_api_key:
         raise SystemExit("Set CURIO_LLM_API_KEY (and CURIO_LLM_BASE_URL / CURIO_LLM_MODEL) in backend/.env first.")
     client = OpenAICompatibleClient(s)
-    try:  # one cheap call first: a wrong URL, key or model name should not cost a full run
-        asyncio.run(client.generate([{"role": "system", "content": SYSTEM}, {"role": "user", "content": 'Reply with the JSON {"ok": true}'}], schema=Ping))
-    except LLMError as exc:
-        raise SystemExit(f"ABORT: the model endpoint did not answer a test call: {exc}")
-    rep = asyncio.run(compare(client, args.with_curio_llm, args.limit))
+    rep = asyncio.run(run_comparison(client, args.with_curio_llm, args.limit))
     check_health(rep)
     REPORTS.mkdir(exist_ok=True)
     stem = "llm_only_smoke" if args.limit else "llm_only"
     (REPORTS / f"{stem}.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1))
     (REPORTS / f"{stem}.md").write_text(to_markdown(rep))
     print(to_markdown(rep))
+
+
+async def run_comparison(client: LLMClient, with_curio_llm: bool, limit: int | None) -> dict:
+    # Ping, benchmark and cleanup share one loop: a pooled HTTP connection cannot
+    # safely be reused after the loop which opened it has already been closed.
+    try:
+        try:
+            await client.generate([{"role": "system", "content": SYSTEM}, {"role": "user", "content": 'Reply with the JSON {"ok": true}'}], schema=Ping)
+        except LLMError as exc:
+            raise SystemExit(f"ABORT: the model endpoint did not answer a test call: {exc}")
+        return await compare(client, with_curio_llm, limit)
+    finally:
+        await client.aclose()
 
 
 if __name__ == "__main__":

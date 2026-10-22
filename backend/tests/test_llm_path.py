@@ -45,6 +45,30 @@ class ScriptedLLM(LLMClient):
         raise LLMError("unexpected schema")
 
 
+@pytest.mark.asyncio
+async def test_json_schema_is_in_the_initial_system_message_without_mutating_input():
+    from config import Settings
+    from evaluation.llm_only import Ping
+    from services.llm import OpenAICompatibleClient
+
+    class StrictTemplateClient(OpenAICompatibleClient):
+        async def _chat(self, messages, json_mode):
+            assert json_mode
+            assert messages[0]["role"] == "system"
+            assert "JSON schema" in messages[0]["content"]
+            assert not any(m["role"] == "system" for m in messages[1:])
+            return '{"ok": true}'
+
+    client = StrictTemplateClient(Settings(_env_file=None))
+    messages = [{"role": "system", "content": "Be helpful."}, {"role": "user", "content": "Hello"}]
+    try:
+        assert (await client.generate(messages, schema=Ping)).ok
+        assert (await client.generate(messages[1:], schema=Ping)).ok
+        assert messages[0]["content"] == "Be helpful."
+    finally:
+        await client.aclose()
+
+
 def _snapshot():
     return StudentSnapshot(student_id="t", mastery={"heat_conduction": 0.5, "heat_flow": 0.8})
 
@@ -70,6 +94,49 @@ async def test_llm_outage_falls_back_to_rules_without_error():
     assert res.diagnosis.misconception_id == "metal_is_colder"
     assert res.transfer.source == "authored"
     assert any(s.status == "fallback" for s in res.trace.steps)
+
+
+@pytest.mark.asyncio
+async def test_llm_cannot_claim_understanding_without_valid_required_evidence():
+    cur = get_curriculum()
+    topic, q = cur.question("heat_001")
+    res = await PedagogicalHarness(cur, ScriptedLLM()).run(topic, q, "Metal conducts heat away from my hand faster.", _snapshot())
+    assert res.verification.reasoning_points_hit == []
+    assert not res.verification.reasoning_correct
+    assert res.verification.classification == "incomplete"
+    assert res.feedback.tone != "celebrate"
+
+
+@pytest.mark.asyncio
+async def test_generated_question_is_not_released_if_its_model_reviewer_fails():
+    class ReviewerDown(ScriptedLLM):
+        async def generate(self, messages, schema=None):
+            if schema.__name__ == "QuestionQuality":
+                raise LLMError("reviewer down")
+            return await super().generate(messages, schema)
+
+    cur = get_curriculum()
+    topic, q = cur.question("heat_001")
+    res = await PedagogicalHarness(cur, ReviewerDown()).run(topic, q, "Metal is colder than wood.", _snapshot())
+    assert res.transfer.source == "authored"
+    assert any(s.mode == "fallback" for s in res.trace.steps)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("flag", ["same_concept", "age_appropriate", "answerable", "curriculum_aligned", "not_a_repeat"])
+async def test_inconsistent_question_review_cannot_override_a_failed_check(flag):
+    class ContradictoryReviewer(ScriptedLLM):
+        async def generate(self, messages, schema=None):
+            result = await super().generate(messages, schema)
+            if schema.__name__ == "QuestionQuality":
+                setattr(result, flag, False)
+                result.approved = True
+            return result
+
+    cur = get_curriculum()
+    topic, q = cur.question("heat_001")
+    res = await PedagogicalHarness(cur, ContradictoryReviewer()).run(topic, q, "Metal is colder than wood.", _snapshot())
+    assert res.transfer.source == "authored"
 
 
 class RecordingLLM(ScriptedLLM):
